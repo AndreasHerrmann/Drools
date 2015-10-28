@@ -1,0 +1,107 @@
+//created on: 09.10.2015
+package de.homeautomation
+
+//list any import classes here.
+import de.homeautomation.devices.*
+
+//declare any global variables here
+
+
+
+
+rule "Wohnzimmer auf 22 Grad heizen"
+
+    when
+        $temp: Temperaturfuehler(ort==Ort.Wohnzimmer && temperatur<22.0F) and
+        $heizung: Heizung(ort==Ort.Wohnzimmer)
+    then
+        $heizung.anschalten();
+
+end
+
+rule "Wohnzimmer auf 22 Grad halten"
+    //include attributes such as "salience" here...
+    when
+        $temp: Temperaturfuehler(ort==Ort.Wohnzimmer && temperatur>=22.0F) and
+        $heizung: Heizung(ort==Ort.Wohnzimmer)
+    then
+        $heizung.ausschalten();
+
+end
+
+rule "Bad auf 25 Grad heizen"
+	when
+		$temp: Temperaturfuehler(ort==Ort.Bad && temperatur<25.0F) and
+		$heizung: Heizung(ort==Ort.Bad)
+	then
+		$heizung.anschalten();
+end
+
+rule "Bad auf 25 Grad halten"
+	when
+		$temp: Temperaturfuehler(ort==Ort.Bad && temperatur>=25.0F) and
+		$heizung: Heizung(ort==Ort.Bad)
+	then
+		$heizung.anschalten();
+end
+
+rule "Schlafzimmer auf 16 Grad heizen"
+	when
+		$temp: Temperaturfuehler(ort==Ort.Schlafzimmer && temperatur<16.0F) and
+		$heizung: Heizung(ort==Ort.Schlafzimmer)
+	then
+		$heizung.anschalten();
+end
+
+rule "Schlafzimmer auf 16 Grad halten"
+	when
+		$temp: Temperaturfuehler(ort==Ort.Schlafzimmer && temperatur >=16.0F) and
+		$heizung: Heizung(ort==Ort.Schlafzimmer)
+	then
+		$heizung.anschalten();
+end
+
+rule "Ambilight mit Fernseher anschalten"
+	when
+		$tv: TV(status==Status.An) 
+		$ambilight: Ambilight()
+		
+	then
+		$ambilight.anschalten();
+		if($tv.getQuelle()<5){
+		$ambilight.setEingang($tv.getQuelle());
+		}
+		else{
+		$ambilight.setEingang(5);
+		}
+end
+
+rule "Ambilight mit Fernsehr ausschalten"
+	when
+		$tv: TV(status==Status.Aus) and
+		$ambilight: Ambilight(status==Status.An) 
+	then
+		$ambilight.ausschalten();
+end
+
+rule "Fernseher mit Gamekonsole einschalten und richtigen Eingang einstellen"
+	when
+		$gc: GameConsole(status==Status.An)
+		$tv: TV()
+	then
+		$tv.anschalten();
+		if($gc.getTyp()==GameConsole.Typ.XboxOne){
+		$tv.setQuelle(1);
+		}
+		else{
+		$tv.setQuelle(2);
+		}
+end
+rule "Wenn der Fernseher angeschalten wird, dann die Rollaeden im Wohnzimmer auf 75% runterlassen"
+when
+	$tv: TV(status==Status.An)
+	$rollo: Rolladen(ort==Ort.Wohnzimmer && geschlossen<75)
+then
+	$rollo.rolladenBewegen(75);
+end
+ 

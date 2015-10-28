@@ -1,0 +1,62 @@
+//created on: 13.10.2015
+package de.hdm.bahnhofsteuerung
+
+//list any import classes here.
+import de.hdm.bahnhofsteuerung.bahnhof.*;
+import de.hdm.bahnhofsteuerung.events.*
+import org.drools.core.time.SessionPseudoClock;
+
+
+//declare any global variables here
+declare Zugeinfahrt
+	@role(event)
+end
+
+declare Zugdurchfahrt
+	@role(event)
+end
+
+declare Zugabfahrt
+	@role(event)
+end
+
+
+
+rule "Zugeinfahrt bekanntgeben"
+    when
+        $ze: Zugeinfahrt()
+    then
+        $ze.getGleis().getAnzeige().anzeigen("Der Zug "+$ze.getZug().getId()
+        +" mit dem Ziel "+$ze.getZiel()+" ist eingefahren."); 
+end
+
+rule "Zugabfahrt bekanntgeben"
+    when
+        $za: Zugabfahrt()
+        $ze: Zugeinfahrt(zug==$za.zug)
+    then
+		$za.getGleis().getAnzeige().anzeigen("Der Zug "+$za.getZug().getId()
+		+" nach "+$ze.getZiel()+" ist abgefahren");
+		retract($ze);
+end
+
+rule "Zugeinfahrt auf besetztem Gleis verhindern"
+	when
+		$ze1: Zugeinfahrt()
+		$ze2: Zugeinfahrt(this != $ze1 && $ze2.getGleis()==$ze1.getGleis())
+	then
+		System.out.println("Die Zuege "+$ze1.getZug().getId()+" und "
+		+$ze2.getZug().getId()+" auf Gleis "+$ze1.getGleis().getNummer()
+		+" werden kollidieren!!!");
+end
+
+rule "Freies Gleis für durchfahrt finden"
+	when
+	$df: Zugdurchfahrt()
+	$gl: Gleis()
+	not $ze: Zugeinfahrt(gleis==$gl)
+	then
+	insert( new Zugeinfahrt($df.getZug(),$gl,"Durchfahrt","1m"));
+	insert( new Zugabfahrt($df.getZug(),$gl));
+	retract($df);
+	end
