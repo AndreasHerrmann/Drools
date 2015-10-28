@@ -7,13 +7,11 @@ public class Zugeinfahrt {
 	private Zug zug;
 	private Gleis gleis;
 	private String ziel;
-	private String aufenthalt;
 	
-	public Zugeinfahrt(Zug zug, Gleis gleis, String ziel, String aufenthalt){
+	public Zugeinfahrt(Zug zug, Gleis gleis, String ziel){
 		this.zug=zug;
 		this.gleis=gleis;
 		this.ziel=ziel;
-		this.aufenthalt=aufenthalt;
 	}
 	public Zug getZug() {
 		return zug;
@@ -23,8 +21,5 @@ public class Zugeinfahrt {
 	}
 	public String getZiel(){
 		return ziel;
-	}
-	public String getAufenthalt(){
-		return aufenthalt;
 	}
 }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_pArxkHJXEeWBGeAoauygAQ" name="model">
+  <packagedElement xmi:type="uml:Class" xmi:id="_xONaYHJcEeWBGeAoauygAQ" name="java.util.Date"/>
+  <packagedElement xmi:type="uml:Package" xmi:id="_3G2zUHJdEeWBGeAoauygAQ" name="de.hdm.bahnhofsteuerung">
+    <packagedElement xmi:type="uml:Package" xmi:id="_7wnzwHJdEeWBGeAoauygAQ" name="de.hdm.bahnhofsteuerung.bahnhof">
+      <packagedElement xmi:type="uml:Class" xmi:id="_XZnXwHJYEeWBGeAoauygAQ" name="Bahnhof">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_MTQR4HJZEeWBGeAoauygAQ" name="gleise" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_QwGQoHJZEeWBGeAoauygAQ" value="1"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_QwLJIHJZEeWBGeAoauygAQ" value="*"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_S-ZUMHJZEeWBGeAoauygAQ" name="name" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedAttribute>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_gIZs0HJYEeWBGeAoauygAQ" name="Gleis">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_4XfuEHJYEeWBGeAoauygAQ" name="nummer" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_Li7ywHJaEeWBGeAoauygAQ" name="anzeige" visibility="private" type="_Hc6YkHJaEeWBGeAoauygAQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_afMzMHJZEeWBGeAoauygAQ" name="Zug">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_fdTE4HJZEeWBGeAoauygAQ" name="ID" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_aofxwHJcEeWBGeAoauygAQ" name="verbindung" visibility="private" type="_pS54EHJZEeWBGeAoauygAQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_n8F2IHJZEeWBGeAoauygAQ" name="Fahrplan">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_rVDWAHJZEeWBGeAoauygAQ" name="verbindungen" visibility="private" type="_pS54EHJZEeWBGeAoauygAQ">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_ujEKIHJZEeWBGeAoauygAQ" value="1"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_ujF_UHJZEeWBGeAoauygAQ" value="*"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_nyP2QHJcEeWBGeAoauygAQ" name="start" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_7fvUkHJcEeWBGeAoauygAQ" name="ende" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="__tmcIHJcEeWBGeAoauygAQ" name="intervall" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_pS54EHJZEeWBGeAoauygAQ" name="Verbindung">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_W2UgoHJcEeWBGeAoauygAQ" name="zug" visibility="private" type="_afMzMHJZEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_M763kHJdEeWBGeAoauygAQ" name="einfahrt" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_QbdgkHJdEeWBGeAoauygAQ" name="aufenthalt" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_rcVF4HJdEeWBGeAoauygAQ" name="gleis" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_Hc6YkHJaEeWBGeAoauygAQ" name="Anzeige">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_burBkHJaEeWBGeAoauygAQ" name="anzeigen" visibility="private">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_pPJkAHJaEeWBGeAoauygAQ" name="verbindung" type="_pS54EHJZEeWBGeAoauygAQ"/>
+        </ownedOperation>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_xNevsHJeEeWBGeAoauygAQ" name="de.hdm.bahnhofsteuerung.events">
+      <packagedElement xmi:type="uml:Class" xmi:id="_1S3QsHJeEeWBGeAoauygAQ" name="Zugeinfahrt">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_4CmNYHJeEeWBGeAoauygAQ" name="uhrzeit" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_Ae98wHJfEeWBGeAoauygAQ" name="gleis" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_IKVF8HJfEeWBGeAoauygAQ" name="zug" visibility="private" type="_afMzMHJZEeWBGeAoauygAQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_QOuaMHJfEeWBGeAoauygAQ" name="Zugabfahrt">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_VAgHIHJfEeWBGeAoauygAQ" name="uhrzeit" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_f5N9IHJfEeWBGeAoauygAQ" name="gleis" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_jqnLIHJfEeWBGeAoauygAQ" name="zug" visibility="private" type="_afMzMHJZEeWBGeAoauygAQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_oo0KgHJfEeWBGeAoauygAQ" name="Verspaetung">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_r0bx8HJfEeWBGeAoauygAQ" name="verbindung" visibility="private" type="_pS54EHJZEeWBGeAoauygAQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_zuVtcHJfEeWBGeAoauygAQ" name="zeit" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+      </packagedElement>
+    </packagedElement>
+  </packagedElement>
+</uml:Model>
