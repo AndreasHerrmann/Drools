@@ -19,6 +19,9 @@ declare Zugabfahrt
 	@role(event)
 end
 
+declare ZugKollision
+	@role(event)
+end
 
 
 rule "Zugeinfahrt bekanntgeben"
@@ -26,7 +29,7 @@ rule "Zugeinfahrt bekanntgeben"
     when
         $ze: Zugeinfahrt()
     then
-        $ze.getGleis().getAnzeige().anzeigen("Der Zug "+$ze.getZug().getId()
+        $ze.getGleis().getAnzeige().anzeigen("Der Zug "+$ze.getZug().getNummer()
         +" mit dem Ziel "+$ze.getZiel()+" ist eingefahren."); 
 end
 
@@ -36,7 +39,29 @@ rule "Zugabfahrt bekanntgeben"
         $za: Zugabfahrt()
         $ze: Zugeinfahrt(zug==$za.zug)
     then
-		$za.getGleis().getAnzeige().anzeigen("Der Zug "+$za.getZug().getId()
+		$za.getGleis().getAnzeige().anzeigen("Der Zug "+$za.getZug().getNummer()
 		+" nach "+$ze.getZiel()+" ist abgefahren");
 end
 
+rule "Kollisionen erkennen"
+	salience(100)
+	no-loop
+	when
+		$ze1: Zugeinfahrt() and
+		$ze2: Zugeinfahrt(this after $ze1 && gleis==$ze1.getGleis()) and
+		not ZugKollision(zug1==$ze1.getZug() && zug2==$ze2.getZug() && gleis==$ze1.getGleis()) and
+		not Zugabfahrt(this after $ze1 && zug==$ze1.getZug() && gleis==$ze1.getGleis())
+	then
+		insert(new ZugKollision($ze1.getZug(),$ze2.getZug(),$ze1.getGleis()));
+end
+
+rule "Kollision ausgeben"
+	salience(100)
+	no-loop
+	when
+		$zk: ZugKollision()
+	then
+	System.out.println("Die Züge "+$zk.getZug1().getNummer()+" und "
+	+$zk.getZug2().getNummer()+ " werden auf Gleis "+$zk.getGleis().getNummer()
+	+" kollidieren!");
+end

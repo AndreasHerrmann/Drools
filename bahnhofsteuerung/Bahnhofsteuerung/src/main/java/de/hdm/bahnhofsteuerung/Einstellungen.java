@@ -6,7 +6,7 @@ package de.hdm.bahnhofsteuerung;
 public class Einstellungen {
 	private Einstellungen einstellungen=null;
 	//Länge einer Zeiteinheit in Millisekunden
-	private long zeitEinheitLaenge = 500;
+	private long zeitEinheitLaenge = 250;
 
 
 	public Einstellungen einstellungen(){

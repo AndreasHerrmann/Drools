@@ -39,9 +39,6 @@ public class Zug extends Thread {
 			catch(IllegalArgumentException iae){
 				iae.printStackTrace();
 			}
-			finally{
-				this.nummer=0;
-			}
 		}
 	}
 

@@ -45,9 +45,15 @@ public class Bahnhofsteuerung {
 			kSession.insert(gleis1);
 			kSession.insert(gleis2);
 			
+			//Zeiteinheitslänge ausgeben
+			System.out.println("Die Länge einer Zeiteinheit sind "
+			+new Einstellungen().getZeitEinheitLaenge()
+			+"ms");
+			
 			//Züge erstellen
 			new Zug(kSession,1,gleis1,60,30,"Herrenberg");
 			new Zug(kSession,2,gleis2,60,30,"Stuttgart");
+			new Zug(kSession,3,gleis1,70,30,"Singen");
 			System.out.println("Züge gestartet");
 			//KieSession in neuem Thread starten
 			new Thread() {
