@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class StockEvent {
 	private Stock stock;
-	private Date timestamp;
+	private Date stamp;
 	private float openValue;
 	private float closeValue;
 	private float dailyHigh;
@@ -13,7 +13,7 @@ public class StockEvent {
 	public StockEvent(Stock stock, Date timestamp, float openValue, float closeValue,
 			float dailyHigh, float dailyLow) {
 		this.stock=stock;
-		this.timestamp = timestamp;
+		this.stamp = timestamp;
 		this.openValue = openValue;
 		this.closeValue = closeValue;
 		this.dailyHigh = dailyHigh;
@@ -24,8 +24,8 @@ public class StockEvent {
 		return stock;
 	}
 
-	public Date getTimestamp() {
-		return timestamp;
+	public Date getstamp() {
+		return stamp;
 	}
 
 	public float getOpenValue() {

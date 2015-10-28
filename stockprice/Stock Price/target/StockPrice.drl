@@ -8,7 +8,7 @@ import de.hdm.stockprice.StockEvent;
 //declare any global variables here
 declare StockEvent
 	@role(event)
-	@timestamp(timestamp)
+	//@timestamp(timestamp)
 end
 
 
@@ -18,33 +18,25 @@ rule "Tage finden, an denen die Aktie an Wert verloren hat"
     when
         $stockEvent: StockEvent(openValue>closeValue)
     then
-        System.out.println($stockEvent.getStock().getName()+" hat am "+$stockEvent.getTimestamp()+" an Wert verloren");
+        System.out.println($stockEvent.getStock().getName()+" hat an Wert verloren");
 
-end
-
-rule "Aktien vor dem 1.November 2005 ausgeben"
-
-	when
-		$stockEvent: StockEvent(timestamp < "01-Nov-2005")
-	then
-		System.out.println($stockEvent.getStock().getName()+": "+$stockEvent.getTimestamp());
 end
 
 rule "Tage finden an denen die Aktie mindestens 5% unter dem Durchschnitt der letzten 100 Tage lag"
 	when
-		$stockEvent: StockEvent ($dailyAve: ((dailyHigh+dailyLow)/2), $date: timestamp, $stock: stock)
-		Number($value: (floatValue*0.95), $value>$dailyAve) from accumulate( StockEvent($stock==stock, $close:closeValue)
-		over window:length(100), average($close))
+		$stockEvent: StockEvent ($dailyAve: ((dailyHigh+dailyLow)/2), $stock: stock) and
+		Number($value: (floatValue*0.95), $value>$dailyAve) from accumulate( StockEvent($stock==stock, $close:closeValue)over window:length(100)
+		,average($close)) 
 	then
-		System.out.println($stock.getName()+" lag am "+$stockEvent.getTimestamp()+" mindestens 5% unter dem Durschnitt der letzten 100 Tage");
+		System.out.println($stock.getName()+" lag mindestens 5% unter dem Durschnitt der letzten 100 Tage");
 end
 
 rule "Tage finden an denen Microsoft und IBM gefallen sind"
 	no-loop
 	when
-		$se1: StockEvent(openValue>closeValue, $stock:stock, $date:timestamp) and
-		$se2: StockEvent(openValue>closeValue && $stock!=stock && $date==timestamp)
+		$se1: StockEvent(openValue>closeValue, $stock:stock) and
+		$se2: StockEvent(openValue>closeValue && $stock!=stock && this coincides $se1)
 	then
-		System.out.println("Am "+$se1.getTimestamp()+" sind "+$se1.getStock().getName()
+		System.out.println("Heute sind "+$se1.getStock().getName()
 		+" und "+$se2.getStock().getName()+" gefallen");
 end
