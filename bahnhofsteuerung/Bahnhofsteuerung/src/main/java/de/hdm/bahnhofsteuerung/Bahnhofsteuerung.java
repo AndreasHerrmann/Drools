@@ -54,6 +54,7 @@ public class Bahnhofsteuerung {
 			new Zug(kSession,1,gleis1,60,30,"Herrenberg");
 			new Zug(kSession,2,gleis2,60,30,"Stuttgart");
 			new Zug(kSession,3,gleis1,70,30,"Singen");
+			new Zug(kSession,4,gleis2,50,2,"Plochingen");
 			System.out.println("Züge gestartet");
 			//KieSession in neuem Thread starten
 			new Thread() {
