@@ -1,19 +1,17 @@
-package de.hdm.stockprice;
+package de.hdm.stockprice.events;
 
-import java.util.Date;
+import de.hdm.stockprice.Stock;
 
 public class StockEvent {
 	private Stock stock;
-	private Date stamp;
 	private float openValue;
 	private float closeValue;
 	private float dailyHigh;
 	private float dailyLow;
 	
-	public StockEvent(Stock stock, Date timestamp, float openValue, float closeValue,
+	public StockEvent(Stock stock, float openValue, float closeValue,
 			float dailyHigh, float dailyLow) {
 		this.stock=stock;
-		this.stamp = timestamp;
 		this.openValue = openValue;
 		this.closeValue = closeValue;
 		this.dailyHigh = dailyHigh;
@@ -22,10 +20,6 @@ public class StockEvent {
 
 	public Stock getStock() {
 		return stock;
-	}
-
-	public Date getstamp() {
-		return stamp;
 	}
 
 	public float getOpenValue() {
@@ -42,5 +36,11 @@ public class StockEvent {
 
 	public float getDailyLow() {
 		return dailyLow;
+	}
+	
+	@Override
+	public String toString(){
+		return new String(openValue+" "+closeValue+" "+dailyHigh+" "+dailyLow);
+		
 	}
 }

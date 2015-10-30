@@ -18,15 +18,19 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.conf.ClockTypeOption;
 
+import de.hdm.stockprice.GUI.StockPriceGUI;
+import de.hdm.stockprice.events.StockEvent;
+
 @SuppressWarnings("restriction")
 public class StockPrice {
 	private static KieSession kSession;
 	
 	public static void main(String[] args) {
-		Stock ibm = new Stock("International Business Machines","ibm");
+		final StockPriceGUI gui;
+		final Stock ibm = new Stock("International Business Machines","ibm");
 		CSVReader ibmCSVReader = new CSVReader(ibm,"/home/user/Downloads/ibm.csv");
 		final Vector<StockEvent> ibmStockEvents = ibmCSVReader.createStockEvents();
-		Stock msft = new Stock("Microsoft","msft");
+		final Stock msft = new Stock("Microsoft","msft");
 		CSVReader msftCSVReader = new CSVReader(msft,"/home/user/Downloads/microsoft.csv");
 		final Vector<StockEvent> msftStockEvents = msftCSVReader.createStockEvents();
 		
@@ -59,6 +63,9 @@ public class StockPrice {
 		            kSession.fireUntilHalt();
 		        }
 		    }.start();
+		    //GUI anzeigen
+			gui = StockPriceGUI.createNewGUI();
+			gui.setVisible(true);
 		    
 		    //Aktiendaten in neuem Thread einfügen
 		    new Thread(){
@@ -66,17 +73,23 @@ public class StockPrice {
 		    	public void run(){
 		    		//Solange einfügen, bis keine mehr da sind
 		    		for(int i=1; (i<ibmStockEvents.size())&&(i<msftStockEvents.size());i++){
-		    			System.out.println(new Date(clock.getCurrentTime()));
+		    			gui.changeDatum(new Date(clock.getCurrentTime()).toString());
 		    			//IBM Stock Events einfügen
 		    			kSession.insert(ibmStockEvents.get(i));
+		    			System.out.println("IBM: "+ibmStockEvents.get(i));
 		    			//Microsoft Stock Events einfügen
 		    			kSession.insert(msftStockEvents.get(i));
-		    			//Uhr vordrehen
+		    			System.out.println("Microsoft: "+msftStockEvents.get(i));
+		    			//Uhr um einen Tag vordrehen
 		    			clock.advanceTime(1, TimeUnit.DAYS);
+		    			//Aktientrend ausgeben
+		    			gui.changeIbmTrend(ibm.getTrend().toString());
+		    			gui.changeMicrosoftTrend(msft.getTrend().toString());
+		    			
 		    			try {
-							sleep(2000);
+		    				//Zwei Sekunden warten
+							sleep(1000);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 		    		}

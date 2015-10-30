@@ -2,13 +2,18 @@
 package de.hdm.stockprice
 
 //list any import classes here.
-import de.hdm.stockprice.StockEvent;
+import de.hdm.stockprice.events.*;
 
 
 //declare any global variables here
 declare StockEvent
 	@role(event)
-	//@timestamp(timestamp)
+	@duration(1d)
+end
+
+declare Wertverlust
+	@role(event)
+	@duration(1d)
 end
 
 
@@ -18,25 +23,38 @@ rule "Tage finden, an denen die Aktie an Wert verloren hat"
     when
         $stockEvent: StockEvent(openValue>closeValue)
     then
-        System.out.println($stockEvent.getStock().getName()+" hat an Wert verloren");
+        insert(new Wertverlust($stockEvent,($stockEvent.getOpenValue()-$stockEvent.getCloseValue())));
 
 end
 
 rule "Tage finden an denen die Aktie mindestens 5% unter dem Durchschnitt der letzten 100 Tage lag"
 	when
 		$stockEvent: StockEvent ($dailyAve: ((dailyHigh+dailyLow)/2), $stock: stock) and
-		Number($value: (floatValue*0.95), $value>$dailyAve) from accumulate( StockEvent($stock==stock, $close:closeValue)over window:length(100)
+		not StockEvent(stock==$stock && this after $stockEvent)
+		Number($value: (floatValue*0.9), $value>$dailyAve) from accumulate( StockEvent($stock==stock, $close:closeValue)over window:time(100d)
 		,average($close)) 
 	then
-		System.out.println($stock.getName()+" lag mindestens 5% unter dem Durschnitt der letzten 100 Tage");
+		System.out.println($stock.getName()+" lag mindestens 10% unter dem Durschnitt der letzten 100 Tage");
 end
 
 rule "Tage finden an denen Microsoft und IBM gefallen sind"
 	no-loop
 	when
-		$se1: StockEvent(openValue>closeValue, $stock:stock) and
-		$se2: StockEvent(openValue>closeValue && $stock!=stock && this coincides $se1)
+		$wv: Wertverlust(getStockEvent().getStock().getSymbol()=="ibm") and
+			 Wertverlust(getStockEvent().getStock().getSymbol()=="msft" && this coincides $wv)
 	then
-		System.out.println("Heute sind "+$se1.getStock().getName()
-		+" und "+$se2.getStock().getName()+" gefallen");
+		System.out.println("Heute sind IBM und Microsoft gefallen");
+end
+
+rule "Aktientrend"
+	no-loop
+	when
+	$se: StockEvent($stock:stock) and
+	not StockEvent($stock==stock && this after $se)
+		 Number($trend: floatValue) from accumulate( StockEvent(stock==$stock, $wertaenderung: (closeValue-openValue)) 
+		 over window:time(5d), average($wertaenderung))
+	then
+	if($trend>0){$stock.setTrend(Trend.steigend);}
+	if($trend<0){$stock.setTrend(Trend.fallend);}
+	else{$stock.setTrend(Trend.stagnierend);}
 end
