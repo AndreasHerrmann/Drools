@@ -27,7 +27,7 @@ rule "Tage finden, an denen die Aktie an Wert verloren hat"
 
 end
 
-rule "Tage finden an denen die Aktie mindestens 5% unter dem Durchschnitt der letzten 100 Tage lag"
+rule "Tage finden an denen die Aktie mindestens 10% unter dem Durchschnitt der letzten 100 Tage lag"
 	when
 		$stockEvent: StockEvent ($dailyAve: ((dailyHigh+dailyLow)/2), $stock: stock) and
 		not StockEvent(stock==$stock && this after $stockEvent)
