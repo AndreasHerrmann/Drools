@@ -1,0 +1,9 @@
+Home automation Project
+
+Ziel ist eine eventgetriebene Home Automation Software
+
+Folgende Geräte sind einzubinden: 	TV, XBOX One, Wii U, HTPC,
+									Rolladensteuerung, Ambilight,
+									HDMI-Switch, Wifi-Router,
+									Lichtsteuerung, PC
+Die Geräte sind als Klassen angelegt und können Events erzeugen.
