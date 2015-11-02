@@ -1,48 +1,60 @@
 package de.hdm.bahnhofsteuerung.bahnhof;
 
+import java.util.Vector;
+
 import org.kie.api.runtime.KieSession;
 
 import de.hdm.bahnhofsteuerung.Einstellungen;
 import de.hdm.bahnhofsteuerung.events.Zugabfahrt;
+import de.hdm.bahnhofsteuerung.events.Zugdurchfahrt;
 import de.hdm.bahnhofsteuerung.events.Zugeinfahrt;
 
 public class Zug extends Thread {
 	private int nummer; //Nummer des Zuges
-	private Gleis gleis; //Gleis auf dem er einfahren soll
-	private final int intervall; //Intervall in dem er fahren soll in Zeiteinheiten
-	private final int aufenthalt; //Länge des Aufenthalts im Bahnhof in Zeiteinheiten
-	private final String ziel; //Ziel das auf der Anzeige angezeigt werden soll
+	private Vector<Weg> weg;
 	private KieSession kSession; //Session in die die Ereignisse eingefügt werden sollen
 	
-	public Zug (KieSession kSession, int nummer, Gleis gleis, int intervall, int aufenthalt, String ziel){
+	public Zug (KieSession kSession, int nummer, Vector<Weg> weg){
 		this.kSession=kSession;
 		this.nummer=nummer;
-		this.gleis=gleis;
-		this.intervall=intervall;
-		this.aufenthalt=aufenthalt;
-		this.ziel=ziel;
+		this.weg=weg;
+		System.out.println("Zug "+nummer+" gestartet");
 		start();
 	}
 	public void run(){
-		Einstellungen einst = new Einstellungen();
+		Einstellungen einst = Einstellungen.einstellungen();
 		//Der Thread soll solange laufen, bis er mit interrupt() angehalten wird
-		while(!isInterrupted()){
-			try{
-				sleep(intervall*einst.getZeitEinheitLaenge());
-				kSession.insert(new Zugeinfahrt(this,gleis,ziel));
-				sleep(aufenthalt*einst.getZeitEinheitLaenge());
-				kSession.insert(new Zugabfahrt(this,gleis));
+		int i=0;
+		while(!isInterrupted()&& i<weg.size()){
+			if(weg.get(i).getAufenthalt()>0){
+				kSession.insert(new Zugeinfahrt(this,weg.get(i).getGleis(),weg.lastElement().getBahnhof().getName()));
+				try {
+					sleep((weg.get(i).getAufenthalt()*einst.getZeitEinheitLaenge()));
+					kSession.insert(new Zugabfahrt(this,weg.get(i).getGleis(),weg.lastElement().getBahnhof().getName()));
+					sleep((weg.get(i).getFahrzeit()*einst.getZeitEinheitLaenge()));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-			catch(InterruptedException ie){
-				ie.printStackTrace();
+			else{
+				kSession.insert(new Zugdurchfahrt(this,weg.get(i).getGleis()));
 			}
-			catch(IllegalArgumentException iae){
-				iae.printStackTrace();
+			if(i>=weg.size()-1){
+				i=0;
+			}
+			else{
+				i++;
 			}
 		}
 	}
 
 	public int getNummer() {
 		return nummer;
+	}
+	public Vector<Weg> getWeg() {
+		return weg;
+	}
+	public String getZiel(){
+		return this.weg.lastElement().getBahnhof().getName();
 	}
 }

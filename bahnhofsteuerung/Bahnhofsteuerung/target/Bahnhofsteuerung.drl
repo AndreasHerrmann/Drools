@@ -37,10 +37,9 @@ rule "Zugabfahrt bekanntgeben"
 	no-loop
     when
         $za: Zugabfahrt()
-        $ze: Zugeinfahrt(zug==$za.zug)
     then
 		$za.getGleis().getAnzeige().anzeigen("Der Zug "+$za.getZug().getNummer()
-		+" nach "+$ze.getZiel()+" ist abgefahren");
+		+" nach "+$za.getZiel()+" ist abgefahren");
 end
 
 rule "Kollisionen erkennen"
@@ -64,23 +63,4 @@ rule "Kollision ausgeben"
 	System.out.println("Die Züge "+$zk.getZug1().getNummer()+" und "
 	+$zk.getZug2().getNummer()+ " werden auf Gleis "+$zk.getGleis().getNummer()
 	+" kollidieren!");
-end
-
-rule "Zugdurchfahrt erkennen"
-	no-loop
-	when
-		$ze: Zugeinfahrt() and
-		Zugabfahrt(this after[0s,10s] $ze && $ze.zug==zug && $ze.gleis==gleis)
-	then
-		insert(new Zugdurchfahrt($ze.getZug(),$ze.getGleis()));
-end
-
-rule "Zugdurchfahrt anzeigen"
-	no-loop
-	when
-		$zd: Zugdurchfahrt()
-	then
-		System.out.println("Zugdurchfahrt: Auf Gleis "+
-		$zd.getGleis().getNummer()+" fährt der Zug "+$zd.getZug().getNummer()
-		+"durch");
 end

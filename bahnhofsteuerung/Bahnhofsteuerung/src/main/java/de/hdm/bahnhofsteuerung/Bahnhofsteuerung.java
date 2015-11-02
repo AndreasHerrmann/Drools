@@ -1,5 +1,7 @@
 package de.hdm.bahnhofsteuerung;
 
+import java.util.Vector;
+
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
@@ -10,8 +12,10 @@ import org.kie.api.builder.Results;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+
+import de.hdm.bahnhofsteuerung.GUI.BahnhofGUI;
 import de.hdm.bahnhofsteuerung.bahnhof.Bahnhof;
-import de.hdm.bahnhofsteuerung.bahnhof.Gleis;
+import de.hdm.bahnhofsteuerung.bahnhof.Weg;
 import de.hdm.bahnhofsteuerung.bahnhof.Zug;
 
 public class Bahnhofsteuerung {
@@ -23,7 +27,6 @@ public class Bahnhofsteuerung {
 		try {
 			KieServices kService = KieServices.Factory.get();
 			KieFileSystem kfs = kService.newKieFileSystem();
-			    	
 			kfs.write(kService.getResources().newClassPathResource("Bahnhofsteuerung.drl"));
 			KieBuilder kieBuilder = kService.newKieBuilder(kfs).buildAll();
 			Results results = kieBuilder.getResults();
@@ -38,24 +41,43 @@ public class Bahnhofsteuerung {
 			KieBase kBase = kieContainer.newKieBase(config);
 			kSession = kBase.newKieSession();
 			
-			//Bahnhof und Gleise erstellen
-			Bahnhof einBahnhof = new Bahnhof(2);
-			Gleis gleis1 = einBahnhof.getGleise().get(0);
-			Gleis gleis2 = einBahnhof.getGleise().get(1);
-			kSession.insert(gleis1);
-			kSession.insert(gleis2);
+			//Bahnhöfe und Gleise erstellen
+			Vector<Bahnhof> bahnhoefe = new Vector<Bahnhof>();
+			Bahnhof boeblingen = new Bahnhof("Boeblingen",2);
+			bahnhoefe.add(boeblingen);
+			Bahnhof herrenberg = new Bahnhof("Herrenberg",2);
+			bahnhoefe.add(herrenberg);
+			Bahnhof maichingen = new Bahnhof("Maichingen",2);
+			bahnhoefe.add(maichingen);
+			Bahnhof stuttgart = new Bahnhof("Stuttgart",4);
+			bahnhoefe.add(stuttgart);
+			Bahnhof leonberg = new Bahnhof("Leonberg",2);
+			bahnhoefe.add(leonberg);
+			Bahnhof plochingen = new Bahnhof("Plochingen",2);
+			bahnhoefe.add(plochingen);
+			Bahnhof flughafen = new Bahnhof("Flughafen",2);
+			bahnhoefe.add(flughafen);
+			Bahnhof tuebingen = new Bahnhof("Tuebingen",3);
+			bahnhoefe.add(tuebingen);
 			
+			//Weg für Zug1 erstellen
+			Vector<Weg> wegZug1 = new Vector<Weg>();
+			wegZug1.add(new Weg(boeblingen,boeblingen.getGleise().get(0),1,20));
+			wegZug1.add(new Weg(stuttgart,stuttgart.getGleise().get(0),1,5));
+			wegZug1.add(new Weg(plochingen,plochingen.getGleise().get(0),1,15));
+			wegZug1.add(new Weg(flughafen,flughafen.getGleise().get(0),1,20));
+			wegZug1.add(new Weg(tuebingen,tuebingen.getGleise().get(1),1,10));
+			wegZug1.add(new Weg(herrenberg,herrenberg.getGleise().get(0),5,5));
+			
+			new BahnhofGUI(bahnhoefe);
 			//Zeiteinheitslänge ausgeben
-			System.out.println("Die Länge einer Zeiteinheit sind "
-			+new Einstellungen().getZeitEinheitLaenge()
+			System.out.println("Die Laenge einer Zeiteinheit ist "
+			+Einstellungen.einstellungen().getZeitEinheitLaenge()
 			+"ms");
 			
-			//Züge erstellen
-			new Zug(kSession,1,gleis1,60,30,"Herrenberg");
-			new Zug(kSession,2,gleis2,60,30,"Stuttgart");
-			new Zug(kSession,3,gleis1,70,30,"Singen");
-			new Zug(kSession,4,gleis2,50,2,"Plochingen");
-			System.out.println("Züge gestartet");
+			//Züge erstellen und einfügen
+			new Zug(kSession,1,wegZug1);
+			
 			//KieSession in neuem Thread starten
 			new Thread() {
 				 
