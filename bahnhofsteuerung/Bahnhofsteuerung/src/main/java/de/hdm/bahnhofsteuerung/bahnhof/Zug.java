@@ -11,13 +11,15 @@ import de.hdm.bahnhofsteuerung.events.Zugeinfahrt;
 
 public class Zug extends Thread {
 	private int nummer; //Nummer des Zuges
-	private Vector<Weg> weg;
+	private Vector<Fahrplan> fahrplan;
+	private String ziel;
 	private KieSession kSession; //Session in die die Ereignisse eingefügt werden sollen
 	
-	public Zug (KieSession kSession, int nummer, Vector<Weg> weg){
+	public Zug (KieSession kSession, int nummer, Vector<Fahrplan> fahrplan, String ziel){
 		this.kSession=kSession;
 		this.nummer=nummer;
-		this.weg=weg;
+		this.fahrplan=fahrplan;
+		this.ziel=ziel;
 		System.out.println("Zug "+nummer+" gestartet");
 		start();
 	}
@@ -25,21 +27,22 @@ public class Zug extends Thread {
 		Einstellungen einst = Einstellungen.einstellungen();
 		//Der Thread soll solange laufen, bis er mit interrupt() angehalten wird
 		int i=0;
-		while(!isInterrupted()&& i<weg.size()){
-			if(weg.get(i).getAufenthalt()>0){
-				kSession.insert(new Zugeinfahrt(this,weg.get(i).getGleis(),weg.lastElement().getBahnhof().getName()));
+		while(!isInterrupted()&& i<fahrplan.size()){
+			if(fahrplan.get(i).getAufenthalt()>0){
+				kSession.insert(new Zugeinfahrt(this,fahrplan.get(i).getGleis(),ziel));
 				try {
-					sleep((weg.get(i).getAufenthalt()*einst.getZeitEinheitLaenge()));
-					kSession.insert(new Zugabfahrt(this,weg.get(i).getGleis(),weg.lastElement().getBahnhof().getName()));
-					sleep((weg.get(i).getFahrzeit()*einst.getZeitEinheitLaenge()));
+					sleep((fahrplan.get(i).getAufenthalt()*einst.getZeitEinheitLaenge()));
+					kSession.insert(new Zugabfahrt(this,fahrplan.get(i).getGleis(),ziel));
+					sleep((fahrplan.get(i).getFahrzeit()*einst.getZeitEinheitLaenge()));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			else{
-				kSession.insert(new Zugdurchfahrt(this,weg.get(i).getGleis()));
+			else if(fahrplan.get(i).getAufenthalt()==0){
+				kSession.insert(new Zugdurchfahrt(this,fahrplan.get(i).getGleis()));
 			}
-			if(i>=weg.size()-1){
+			
+			if(i>=fahrplan.size()-1){
 				i=0;
 			}
 			else{
@@ -51,10 +54,10 @@ public class Zug extends Thread {
 	public int getNummer() {
 		return nummer;
 	}
-	public Vector<Weg> getWeg() {
-		return weg;
+	public Vector<Fahrplan> getFahrplan() {
+		return fahrplan;
 	}
 	public String getZiel(){
-		return this.weg.lastElement().getBahnhof().getName();
+		return ziel;
 	}
 }

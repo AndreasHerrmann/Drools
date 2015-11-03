@@ -1,12 +1,12 @@
 package de.hdm.bahnhofsteuerung.bahnhof;
 
-public class Weg {
+public class Fahrplan {
 	private Bahnhof bahnhof;
 	private Gleis gleis;
 	private int aufenthalt;
 	private int fahrzeit; //Fahrzeit zum nächsten Punkt
 	
-	public Weg(Bahnhof bhf, Gleis gleis, int aufenthalt, int fahrzeit){
+	public Fahrplan(Bahnhof bhf, Gleis gleis, int aufenthalt, int fahrzeit){
 		this.bahnhof=bhf;
 		this.gleis=gleis;
 		this.aufenthalt=aufenthalt;

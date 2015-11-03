@@ -47,8 +47,7 @@ rule "Kollisionen erkennen"
 	no-loop
 	when
 		$ze1: Zugeinfahrt() and
-		$ze2: Zugeinfahrt(this after $ze1 && gleis==$ze1.getGleis()) and
-		not ZugKollision(zug1==$ze1.getZug() && zug2==$ze2.getZug() && gleis==$ze1.getGleis()) and
+		$ze2: Zugeinfahrt(this after $ze1 && gleis==$ze1.getGleis()) and 
 		not Zugabfahrt(this after $ze1 && zug==$ze1.getZug() && gleis==$ze1.getGleis())
 	then
 		insert(new ZugKollision($ze1.getZug(),$ze2.getZug(),$ze1.getGleis()));
@@ -60,7 +59,16 @@ rule "Kollision ausgeben"
 	when
 		$zk: ZugKollision()
 	then
-	System.out.println("Die Züge "+$zk.getZug1().getNummer()+" und "
-	+$zk.getZug2().getNummer()+ " werden auf Gleis "+$zk.getGleis().getNummer()
-	+" kollidieren!");
+	System.out.println($zk.getGleis().getBahnhof().getName()
+	+": Die Zuege "+$zk.getZug().getNummer()+" und "
+	+$zk.getZug2().getNummer()+ " werden auf Gleis "
+	+$zk.getGleis().getNummer()+" kollidieren!");
+end
+
+rule "Zugdurchfahrt anzeigen"
+	when
+		$zd: Zugdurchfahrt()
+	then
+		$zd.getGleis().getAnzeige().anzeigen("Der Zug "+$zd.getZug().getNummer()
+        +" fährt durch.");
 end
