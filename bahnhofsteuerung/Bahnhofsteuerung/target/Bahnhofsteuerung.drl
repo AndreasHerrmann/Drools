@@ -3,10 +3,11 @@ package de.hdm.bahnhofsteuerung
 
 //list any import classes here.
 import de.hdm.bahnhofsteuerung.bahnhof.*;
-import de.hdm.bahnhofsteuerung.events.*
+import de.hdm.bahnhofsteuerung.event.*
 
 
 //declare any global variables here
+
 declare Zugeinfahrt
 	@role(event)
 end
