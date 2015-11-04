@@ -24,10 +24,11 @@ import de.hdm.bahnhofsteuerung.bahnhof.Zug;
 
 @SuppressWarnings("restriction")
 public class Bahnhofsteuerung {
-	private static BahnhofGUI gui;
 	private static KieSession kSession;
  
 	public static void main(String[] args) {
+		final BahnhofGUI gui;
+		
 		//Kie KnowledgeBase laden 
 				
 		try {
@@ -116,7 +117,7 @@ public class Bahnhofsteuerung {
         				try {
 							sleep(Einstellungen.einstellungen().getZeitEinheitLaenge());
 							Einstellungen.einstellungen().vergangeneZeiteinheitenErhoehen();
-							BahnhofGUI.vergangeneZeiteinheitenAktualisieren(Einstellungen.einstellungen().getVergangeneZeiteinheiten());
+							gui.vergangeneZeiteinheitenAktualisieren(Einstellungen.einstellungen().getVergangeneZeiteinheiten());
 						}
         				catch (InterruptedException e) {
 							e.printStackTrace();

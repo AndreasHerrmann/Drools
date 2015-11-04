@@ -5,9 +5,9 @@ import java.util.Vector;
 import org.kie.api.runtime.KieSession;
 
 import de.hdm.bahnhofsteuerung.Einstellungen;
-import de.hdm.bahnhofsteuerung.events.Zugabfahrt;
-import de.hdm.bahnhofsteuerung.events.Zugdurchfahrt;
-import de.hdm.bahnhofsteuerung.events.Zugeinfahrt;
+import de.hdm.bahnhofsteuerung.event.Zugabfahrt;
+import de.hdm.bahnhofsteuerung.event.Zugdurchfahrt;
+import de.hdm.bahnhofsteuerung.event.Zugeinfahrt;
 
 public class Zug extends Thread {
 	private int nummer; //Nummer des Zuges

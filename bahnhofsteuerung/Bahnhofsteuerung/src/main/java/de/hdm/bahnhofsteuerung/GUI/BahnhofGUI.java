@@ -77,7 +77,7 @@ public class BahnhofGUI extends JFrame{
 		setVisible(true);
 	}
 	
-	public static void vergangeneZeiteinheitenAktualisieren(int zeitEinheiten){
+	public void vergangeneZeiteinheitenAktualisieren(int zeitEinheiten){
 		vergangeneZeiteinheiten.setText(Integer.toString(zeitEinheiten));
 		vergangeneZeiteinheiten.repaint();
 	}
