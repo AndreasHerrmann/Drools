@@ -1,71 +1,287 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_pArxkHJXEeWBGeAoauygAQ" name="model">
-  <packagedElement xmi:type="uml:Class" xmi:id="_xONaYHJcEeWBGeAoauygAQ" name="java.util.Date"/>
-  <packagedElement xmi:type="uml:Package" xmi:id="_3G2zUHJdEeWBGeAoauygAQ" name="de.hdm.bahnhofsteuerung">
-    <packagedElement xmi:type="uml:Package" xmi:id="_7wnzwHJdEeWBGeAoauygAQ" name="de.hdm.bahnhofsteuerung.bahnhof">
-      <packagedElement xmi:type="uml:Class" xmi:id="_XZnXwHJYEeWBGeAoauygAQ" name="Bahnhof">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_MTQR4HJZEeWBGeAoauygAQ" name="gleise" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ">
-          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_QwGQoHJZEeWBGeAoauygAQ" value="1"/>
-          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_QwLJIHJZEeWBGeAoauygAQ" value="*"/>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_Gadl4ILpEeWXffnGZNcxQw" name="model">
+  <packagedElement xmi:type="uml:Package" xmi:id="_RYCb0ILrEeWXffnGZNcxQw" name="Types">
+    <packagedElement xmi:type="uml:Class" xmi:id="_udm5QILqEeWXffnGZNcxQw" name="Vector&lt;Bahnhof>"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_X6gfwILqEeWXffnGZNcxQw" name="JTextField"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_V7pJ4ILrEeWXffnGZNcxQw" name="JTextArea"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_wRnGIILtEeWXffnGZNcxQw" name="Vector&lt;Gleis>"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_Nngk8IL1EeWXffnGZNcxQw" name="Vector&lt;Fahrplan>"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_85YawIL0EeWXffnGZNcxQw" name="Thread"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_f_8U0IL1EeWXffnGZNcxQw" name="KieSession"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_KYxhoIMBEeWXffnGZNcxQw" name="JFrame"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_cGvEEIL0EeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung">
+    <packagedElement xmi:type="uml:Package" xmi:id="_--SA0ILrEeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung.GUI">
+      <packagedElement xmi:type="uml:Class" xmi:id="_35ZTsILpEeWXffnGZNcxQw" name="BahnhofGUI">
+        <generalization xmi:type="uml:Generalization" xmi:id="_UGcg0IMBEeWXffnGZNcxQw" general="_KYxhoIMBEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_IgC84ILqEeWXffnGZNcxQw" name="serialVersionUID" visibility="private" isStatic="true">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#ELong"/>
         </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_S-ZUMHJZEeWBGeAoauygAQ" name="name" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
-        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_Qjq1EILqEeWXffnGZNcxQw" name="vergangeneZeiteinheiten" visibility="private" isStatic="true" type="_X6gfwILqEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_p_-QUILqEeWXffnGZNcxQw" name="BahnhofGUI">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_4sYaYILqEeWXffnGZNcxQw" name="bahnhoefe" type="_udm5QILqEeWXffnGZNcxQw"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_AQqrMILrEeWXffnGZNcxQw" name="vergangeneZeiteinheitenAktualisieren">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_F7xz4ILrEeWXffnGZNcxQw" name="zeitEinheiten">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
       </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_gIZs0HJYEeWBGeAoauygAQ" name="Gleis">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_4XfuEHJYEeWBGeAoauygAQ" name="nummer" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_Li7ywHJaEeWBGeAoauygAQ" name="anzeige" visibility="private" type="_Hc6YkHJaEeWBGeAoauygAQ"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_afMzMHJZEeWBGeAoauygAQ" name="Zug">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_fdTE4HJZEeWBGeAoauygAQ" name="ID" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_aofxwHJcEeWBGeAoauygAQ" name="verbindung" visibility="private" type="_pS54EHJZEeWBGeAoauygAQ"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_n8F2IHJZEeWBGeAoauygAQ" name="Fahrplan">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_rVDWAHJZEeWBGeAoauygAQ" name="verbindungen" visibility="private" type="_pS54EHJZEeWBGeAoauygAQ">
-          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_ujEKIHJZEeWBGeAoauygAQ" value="1"/>
-          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_ujF_UHJZEeWBGeAoauygAQ" value="*"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_nyP2QHJcEeWBGeAoauygAQ" name="start" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_7fvUkHJcEeWBGeAoauygAQ" name="ende" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="__tmcIHJcEeWBGeAoauygAQ" name="intervall" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-        </ownedAttribute>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_pS54EHJZEeWBGeAoauygAQ" name="Verbindung">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_W2UgoHJcEeWBGeAoauygAQ" name="zug" visibility="private" type="_afMzMHJZEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_M763kHJdEeWBGeAoauygAQ" name="einfahrt" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_QbdgkHJdEeWBGeAoauygAQ" name="aufenthalt" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_rcVF4HJdEeWBGeAoauygAQ" name="gleis" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_Hc6YkHJaEeWBGeAoauygAQ" name="Anzeige">
-        <ownedOperation xmi:type="uml:Operation" xmi:id="_burBkHJaEeWBGeAoauygAQ" name="anzeigen" visibility="private">
-          <ownedParameter xmi:type="uml:Parameter" xmi:id="_pPJkAHJaEeWBGeAoauygAQ" name="verbindung" type="_pS54EHJZEeWBGeAoauygAQ"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_ba5n4ILrEeWXffnGZNcxQw" name="CustomOutputStream">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_gGxhIILrEeWXffnGZNcxQw" name="textArea" visibility="private" type="_V7pJ4ILrEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_oYVusILrEeWXffnGZNcxQw" name="CustomOutputStream">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_s_wlwILrEeWXffnGZNcxQw" name="textArea" type="_V7pJ4ILrEeWXffnGZNcxQw"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_uq0ZYILrEeWXffnGZNcxQw" name="write">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_yhvnoILrEeWXffnGZNcxQw" name="b">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
         </ownedOperation>
       </packagedElement>
     </packagedElement>
-    <packagedElement xmi:type="uml:Package" xmi:id="_xNevsHJeEeWBGeAoauygAQ" name="de.hdm.bahnhofsteuerung.events">
-      <packagedElement xmi:type="uml:Class" xmi:id="_1S3QsHJeEeWBGeAoauygAQ" name="Zugeinfahrt">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_4CmNYHJeEeWBGeAoauygAQ" name="uhrzeit" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_Ae98wHJfEeWBGeAoauygAQ" name="gleis" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_IKVF8HJfEeWBGeAoauygAQ" name="zug" visibility="private" type="_afMzMHJZEeWBGeAoauygAQ"/>
+    <packagedElement xmi:type="uml:Package" xmi:id="_OwUWMILsEeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung.bahnhof">
+      <packagedElement xmi:type="uml:Class" xmi:id="_-p4BoILsEeWXffnGZNcxQw" name="Anzeige">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_LkhTIILtEeWXffnGZNcxQw" name="gleis" visibility="private" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_QqHT8ILtEeWXffnGZNcxQw" name="Anzeige">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_WL0B8ILtEeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_XjuQEILtEeWXffnGZNcxQw" name="anzeigen">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_fbA8cILtEeWXffnGZNcxQw" name="string">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_hHKVMILtEeWXffnGZNcxQw" name="getGleis">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_l0zwEILtEeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
       </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_QOuaMHJfEeWBGeAoauygAQ" name="Zugabfahrt">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_VAgHIHJfEeWBGeAoauygAQ" name="uhrzeit" visibility="private" type="_xONaYHJcEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_f5N9IHJfEeWBGeAoauygAQ" name="gleis" visibility="private" type="_gIZs0HJYEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_jqnLIHJfEeWBGeAoauygAQ" name="zug" visibility="private" type="_afMzMHJZEeWBGeAoauygAQ"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_oo0KgHJfEeWBGeAoauygAQ" name="Verspaetung">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r0bx8HJfEeWBGeAoauygAQ" name="verbindung" visibility="private" type="_pS54EHJZEeWBGeAoauygAQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_zuVtcHJfEeWBGeAoauygAQ" name="zeit" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_AHM7QILtEeWXffnGZNcxQw" name="Bahnhof">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_2jukcILtEeWXffnGZNcxQw" name="gleise" visibility="private" type="_wRnGIILtEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_79xyUILtEeWXffnGZNcxQw" name="name" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
         </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_D1EesILuEeWXffnGZNcxQw" name="printStream" visibility="private" type="_V7pJ4ILrEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_KHUf4ILuEeWXffnGZNcxQw" name="Bahnhof">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_OHtMIILuEeWXffnGZNcxQw" name="name">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_RI9WoILuEeWXffnGZNcxQw" name="gleisAnzahl">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_WjE18ILuEeWXffnGZNcxQw" name="addGleis"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_ZboXcILuEeWXffnGZNcxQw" name="getGleise">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_enR88ILuEeWXffnGZNcxQw" name="gleise" type="_wRnGIILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_icsvUILuEeWXffnGZNcxQw" name="getName">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_nTZ_kILuEeWXffnGZNcxQw" name="name" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_wzvtYILuEeWXffnGZNcxQw" name="getPrintStream">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_1jbIkILuEeWXffnGZNcxQw" name="printStream" type="_V7pJ4ILrEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_300jcILuEeWXffnGZNcxQw" name="println">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_7WfTYILuEeWXffnGZNcxQw" name="string">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
       </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_CEK-QILtEeWXffnGZNcxQw" name="Fahrplan">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ATVn4ILvEeWXffnGZNcxQw" name="aufenthalt" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_FMST0ILvEeWXffnGZNcxQw" name="bahnhof" visibility="private" type="_AHM7QILtEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_JmlU4ILvEeWXffnGZNcxQw" name="fahrzeit" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_MS4jEILvEeWXffnGZNcxQw" name="gleis" visibility="private" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_S-69QILvEeWXffnGZNcxQw" name="Fahrplan">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_XNzYgILvEeWXffnGZNcxQw" name="bahnhof" type="_AHM7QILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_dtqX4ILvEeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_hAyVgILvEeWXffnGZNcxQw" name="aufenthalt">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_jbfdYILvEeWXffnGZNcxQw" name="fahrzeit">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_pbyL4ILvEeWXffnGZNcxQw" name="getAufenthalt">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_tgHkAILvEeWXffnGZNcxQw" name="aufenthalt" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_uNdyMILvEeWXffnGZNcxQw" name="getBahnhof">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_xqGRIILvEeWXffnGZNcxQw" name="bahnhof" type="_AHM7QILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_hpnTQILzEeWXffnGZNcxQw" name="getFahrzeit">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_ljYaIILzEeWXffnGZNcxQw" name="fahrzeit" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_mXohkILzEeWXffnGZNcxQw" name="getGleis">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_qUgm0ILzEeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_EnSbQILtEeWXffnGZNcxQw" name="Gleis">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_u_Rs0ILzEeWXffnGZNcxQw" name="anzeige" visibility="private" type="_-p4BoILsEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_zSFl0ILzEeWXffnGZNcxQw" name="Bahnhof" visibility="private" type="_AHM7QILtEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_22C0wILzEeWXffnGZNcxQw" name="nummer" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+        </ownedAttribute>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_9-5t0ILzEeWXffnGZNcxQw" name="Gleis">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_BUFg8IL0EeWXffnGZNcxQw" name="bahnhof" type="_AHM7QILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_EIwA8IL0EeWXffnGZNcxQw" name="nummer">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_FAln4IL0EeWXffnGZNcxQw" name="getAnzeige">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_JgeTkIL0EeWXffnGZNcxQw" name="anzeige" type="_-p4BoILsEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_LHNn4IL0EeWXffnGZNcxQw" name="getBahnhof">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_QTccMIL0EeWXffnGZNcxQw" name="bahnhof" type="_AHM7QILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_RA1tsIL0EeWXffnGZNcxQw" name="getNummer">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_UAD34IL0EeWXffnGZNcxQw" name="nummer" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_F_AcIILtEeWXffnGZNcxQw" name="Zug">
+        <generalization xmi:type="uml:Generalization" xmi:id="_DL6SUIMBEeWXffnGZNcxQw" general="_85YawIL0EeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_EslRUIL1EeWXffnGZNcxQw" name="fahrplan" visibility="private" type="_Nngk8IL1EeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_eqIYcIL1EeWXffnGZNcxQw" name="kSession" visibility="private" type="_f_8U0IL1EeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_okDq8IL1EeWXffnGZNcxQw" name="nummer" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_uo134IL1EeWXffnGZNcxQw" name="ziel" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedAttribute>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_0eKFcIL1EeWXffnGZNcxQw" name="Zug">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_4hcUsIL1EeWXffnGZNcxQw" name="kSession" type="_f_8U0IL1EeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_8ewe0IL1EeWXffnGZNcxQw" name="nummer">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_Af4K4IL2EeWXffnGZNcxQw" name="fahrplan" type="_Nngk8IL1EeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_6weioIL2EeWXffnGZNcxQw" name="ziel">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_JTQPkIL3EeWXffnGZNcxQw" name="getFahrplan">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_OF9JkIL3EeWXffnGZNcxQw" name="fahrplan" type="_Nngk8IL1EeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_QlVWEIL3EeWXffnGZNcxQw" name="getNummer">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_Vse2EIL3EeWXffnGZNcxQw" name="nummer" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_aIE3oIL3EeWXffnGZNcxQw" name="getZiel">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_dHE_YIL3EeWXffnGZNcxQw" name="ziel" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_hCg6MIL3EeWXffnGZNcxQw" name="run"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_lXFtwIL3EeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung.event">
+      <packagedElement xmi:type="uml:Class" xmi:id="_yzxVUIL3EeWXffnGZNcxQw" name="ZugEvent" isAbstract="true">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ARrE4IL4EeWXffnGZNcxQw" name="gleis" visibility="protected" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_HNb9IIL4EeWXffnGZNcxQw" name="zug" visibility="protected" type="_F_AcIILtEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_R4LokIL4EeWXffnGZNcxQw" name="getGleis">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_V4zlYIL4EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_Wm0h8IL4EeWXffnGZNcxQw" name="getZug">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_azA1kIL4EeWXffnGZNcxQw" name="zug" type="_F_AcIILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_0PdQMIL3EeWXffnGZNcxQw" name="Zugabfahrt">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_lHNCMIL4EeWXffnGZNcxQw" name="ziel" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedAttribute>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_od1m0IL4EeWXffnGZNcxQw" name="Zugabfahrt">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_rT7DIIL4EeWXffnGZNcxQw" name="zug" type="_F_AcIILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_vycc4IL4EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_xkYUkIL4EeWXffnGZNcxQw" name="ziel">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_yKkK0IL4EeWXffnGZNcxQw" name="getZiel">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_1NmeAIL4EeWXffnGZNcxQw" name="ziel" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_2BlVIIL3EeWXffnGZNcxQw" name="Zugdurchfahrt">
+        <generalization xmi:type="uml:Generalization" xmi:id="_Fb9CUIMBEeWXffnGZNcxQw" general="_yzxVUIL3EeWXffnGZNcxQw"/>
+        <generalization xmi:type="uml:Generalization" xmi:id="_GQh54IMBEeWXffnGZNcxQw" general="_0PdQMIL3EeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_45p5AIL4EeWXffnGZNcxQw" name="Zugdurchfahrt">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_9yt5sIL4EeWXffnGZNcxQw" name="zug" type="_F_AcIILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_EvzAkIL5EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_3v5REIL3EeWXffnGZNcxQw" name="Zugeinfahrt">
+        <generalization xmi:type="uml:Generalization" xmi:id="_HA0uYIMBEeWXffnGZNcxQw" general="_yzxVUIL3EeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_G7fcEIL5EeWXffnGZNcxQw" name="ziel" visibility="private">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedAttribute>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_MVgNsIL5EeWXffnGZNcxQw" name="Zugeinfahrt">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_PaYT8IL5EeWXffnGZNcxQw" name="zug" type="_F_AcIILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_RNsrsIL5EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_TCSOwIL5EeWXffnGZNcxQw" name="ziel">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_Tv90IIL5EeWXffnGZNcxQw" name="getZiel">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_Zldn4IL5EeWXffnGZNcxQw" name="ziel" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_5xvNAIL3EeWXffnGZNcxQw" name="ZugKollision">
+        <generalization xmi:type="uml:Generalization" xmi:id="_H02MUIMBEeWXffnGZNcxQw" general="_yzxVUIL3EeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_dUihsIL5EeWXffnGZNcxQw" name="zug2" visibility="private" type="_F_AcIILtEeWXffnGZNcxQw"/>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_gS6-YIL5EeWXffnGZNcxQw" name="ZugKollision">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_i7eVAIL5EeWXffnGZNcxQw" name="zug1" type="_F_AcIILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_kcTOkIL5EeWXffnGZNcxQw" name="zug2" type="_F_AcIILtEeWXffnGZNcxQw"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_mUPnoIL5EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_p4M2kIL5EeWXffnGZNcxQw" name="getZug2">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_sqcUsIL5EeWXffnGZNcxQw" name="zug2" type="_F_AcIILtEeWXffnGZNcxQw" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_WVPToIMBEeWXffnGZNcxQw" name="Bahnhofsteuerung">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_gx_mYIMBEeWXffnGZNcxQw" name="kSession" visibility="private" isStatic="true" type="_f_8U0IL1EeWXffnGZNcxQw"/>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_rEei0IMBEeWXffnGZNcxQw" name="main" isStatic="true">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_rEei0YMBEeWXffnGZNcxQw" name="args">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_uH5QgIMBEeWXffnGZNcxQw"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_uH8T0IMBEeWXffnGZNcxQw" value="*"/>
+        </ownedParameter>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_3ksiIIMBEeWXffnGZNcxQw" name="Einstellungen">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_9QgOYIMBEeWXffnGZNcxQw" name="einstellungen" visibility="private" isStatic="true" type="_3ksiIIMBEeWXffnGZNcxQw"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_DtCM8IMCEeWXffnGZNcxQw" name="vergangeneZeiteinheiten" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_KbrPMIMCEeWXffnGZNcxQw" name="zeitEinheitLaenge" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#ELong"/>
+      </ownedAttribute>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_Oq5osIMCEeWXffnGZNcxQw" name="Einstellungen" visibility="private"/>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_W_3vkIMCEeWXffnGZNcxQw" name="einstellungen" isStatic="true">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_W_3vkYMCEeWXffnGZNcxQw" name="einstellungen" direction="return"/>
+      </ownedOperation>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_euGmkIMCEeWXffnGZNcxQw" name="getVergangeneZeiteinheiten">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_euGmkYMCEeWXffnGZNcxQw" name="zeitEinheiten" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_m4w64IMCEeWXffnGZNcxQw" name="getZeitEinheitLaenge">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_m4w64YMCEeWXffnGZNcxQw" name="zeitEinheitLaenge" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#ELong"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_rSBaIIMCEeWXffnGZNcxQw" name="vergangeneZeiteinheitenErhoehen"/>
     </packagedElement>
   </packagedElement>
 </uml:Model>
