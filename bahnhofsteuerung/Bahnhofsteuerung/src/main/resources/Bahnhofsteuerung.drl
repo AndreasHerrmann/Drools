@@ -31,7 +31,7 @@ rule "Zugeinfahrt bekanntgeben"
         $ze: Zugeinfahrt()
     then
         $ze.getGleis().getAnzeige().anzeigen("Der Zug "+$ze.getZug().getNummer()
-        +" mit dem Ziel "+$ze.getZiel()+" ist eingefahren."); 
+        +" nach "+$ze.getZiel()+" ist eingefahren."); 
 end
 
 rule "Zugabfahrt bekanntgeben"

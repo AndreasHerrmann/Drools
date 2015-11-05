@@ -92,6 +92,13 @@ public class Bahnhofsteuerung {
 			fahrplanZug3.add(new Fahrplan(flughafen,flughafen.getGleise().get(0),2,18));
 			fahrplanZug3.add(new Fahrplan(tuebingen,tuebingen.getGleise().get(2),0,9));
 			
+			//Fahrplan für Zug4 erstellen
+			Vector<Fahrplan> fahrplanZug4 = new Vector<Fahrplan>();
+			fahrplanZug4.add(new Fahrplan(tuebingen,tuebingen.getGleise().get(1),1,20));
+			fahrplanZug4.add(new Fahrplan(flughafen,flughafen.getGleise().get(0),1,15));
+			fahrplanZug4.add(new Fahrplan(plochingen,plochingen.getGleise().get(1),1,5));
+			fahrplanZug4.add(new Fahrplan(stuttgart,stuttgart.getGleise().get(3),1,25));
+			
 			//GUI erstellen und anzeigen lassen
 			gui = new BahnhofGUI(bahnhoefe);
 			
@@ -104,6 +111,7 @@ public class Bahnhofsteuerung {
 			new Zug(kSession,1,fahrplanZug1,"Herrenberg");
 			new Zug(kSession,2,fahrplanZug2,"Boeblingen");
 			new Zug(kSession,3,fahrplanZug3,"Flughafen");
+			new Zug(kSession,4,fahrplanZug4,"Stuttgart, über Plochingen");
 			
 			//Referenz auf PseudoClock erhalten
         	final SessionPseudoClock clock = kSession.getSessionClock();
