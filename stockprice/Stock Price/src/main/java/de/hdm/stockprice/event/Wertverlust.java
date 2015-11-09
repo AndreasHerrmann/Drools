@@ -1,4 +1,4 @@
-package de.hdm.stockprice.events;
+package de.hdm.stockprice.event;
 
 public class Wertverlust {
 	private StockEvent event;

@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
-import de.hdm.stockprice.events.StockEvent;
+import de.hdm.stockprice.event.StockEvent;
 
 public class CSVReader {
 	private Stock stock;

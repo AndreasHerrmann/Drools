@@ -2,6 +2,7 @@
 package de.hdm.stockprice
 
 //list any import classes here.
+import de.hdm.stockprice.Stock;
 import de.hdm.stockprice.events.*;
 
 

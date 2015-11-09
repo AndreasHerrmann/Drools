@@ -19,7 +19,7 @@ import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.conf.ClockTypeOption;
 
 import de.hdm.stockprice.GUI.StockPriceGUI;
-import de.hdm.stockprice.events.StockEvent;
+import de.hdm.stockprice.event.StockEvent;
 
 @SuppressWarnings("restriction")
 public class StockPrice {
