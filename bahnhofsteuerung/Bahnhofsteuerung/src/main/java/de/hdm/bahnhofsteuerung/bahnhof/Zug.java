@@ -9,12 +9,32 @@ import de.hdm.bahnhofsteuerung.event.Zugabfahrt;
 import de.hdm.bahnhofsteuerung.event.Zugdurchfahrt;
 import de.hdm.bahnhofsteuerung.event.Zugeinfahrt;
 
+/**
+ * Stellt einen Zug dar, der selbständig seinen Fahrplan abfährt.
+ * 
+ * @param nummer Nummer des Zugs
+ * @param fahrplan Fahrplan, den der Zug abfahren soll
+ * @param ziel Name des Zielbahnhofs. Nur wichtig für die Anzeige
+ * @param kSession Die KieSession die das System benutzt. Wichtig um
+ *  die Events in die richtige Session einzufügen
+ * @author Andreas Herrmann
+ * 
+ */
 public class Zug extends Thread {
 	private int nummer; //Nummer des Zuges
 	private Vector<Fahrplan> fahrplan;
 	private String ziel;
 	private KieSession kSession; //Session in die die Ereignisse eingefügt werden sollen
 	
+	/**
+	 * Konstruktor der Klasse
+	 * Initialisiert alle wichtigen Parameter der Klasse, gibt aus, dass der Zug gestartet wurde
+	 * und startet den Thread, in dem der Zug abläuft
+	 * @param kSession Die KieSession der Applikation
+	 * @param nummer Die Nummer des Zuges
+	 * @param fahrplan Die Stationen, die abgefahren werden sollen
+	 * @param ziel Der Name des Zielbahnhofs
+	 */
 	public Zug (KieSession kSession, int nummer, Vector<Fahrplan> fahrplan, String ziel){
 		this.kSession=kSession;
 		this.nummer=nummer;
@@ -23,6 +43,7 @@ public class Zug extends Thread {
 		System.out.println("Zug "+nummer+" gestartet");
 		start();
 	}
+	@Override
 	public void run(){
 		Einstellungen einst = Einstellungen.einstellungen();
 		//Der Thread soll solange laufen, bis er mit interrupt() angehalten wird
@@ -50,10 +71,19 @@ public class Zug extends Thread {
 			}
 		}
 	}
-
+	
+	/**
+	 * Gibt die Nummer des Zuges zurück
+	 * @return Zugnummer
+	 */
 	public int getNummer() {
 		return nummer;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public Vector<Fahrplan> getFahrplan() {
 		return fahrplan;
 	}

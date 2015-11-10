@@ -9,6 +9,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="_85YawIL0EeWXffnGZNcxQw" name="Thread"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_f_8U0IL1EeWXffnGZNcxQw" name="KieSession"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_KYxhoIMBEeWXffnGZNcxQw" name="JFrame"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_nJR8cIbOEeWWscxykNHSAg" name="OutputStream"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_cGvEEIL0EeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung">
     <packagedElement xmi:type="uml:Package" xmi:id="_--SA0ILrEeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung.GUI">
@@ -28,6 +29,7 @@
         </ownedOperation>
       </packagedElement>
       <packagedElement xmi:type="uml:Class" xmi:id="_ba5n4ILrEeWXffnGZNcxQw" name="CustomOutputStream">
+        <generalization xmi:type="uml:Generalization" xmi:id="_qic3sIbOEeWWscxykNHSAg" general="_nJR8cIbOEeWWscxykNHSAg"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_gGxhIILrEeWXffnGZNcxQw" name="textArea" visibility="private" type="_V7pJ4ILrEeWXffnGZNcxQw"/>
         <ownedOperation xmi:type="uml:Operation" xmi:id="_oYVusILrEeWXffnGZNcxQw" name="CustomOutputStream">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_s_wlwILrEeWXffnGZNcxQw" name="textArea" type="_V7pJ4ILrEeWXffnGZNcxQw"/>
@@ -41,6 +43,7 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_OwUWMILsEeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung.bahnhof">
       <packagedElement xmi:type="uml:Class" xmi:id="_-p4BoILsEeWXffnGZNcxQw" name="Anzeige">
+        <generalization xmi:type="uml:Generalization" xmi:id="_jDQo4IPGEeWEdaQuaEcsNA" general="_V7pJ4ILrEeWXffnGZNcxQw"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_LkhTIILtEeWXffnGZNcxQw" name="gleis" visibility="private" type="_EnSbQILtEeWXffnGZNcxQw"/>
         <ownedOperation xmi:type="uml:Operation" xmi:id="_QqHT8ILtEeWXffnGZNcxQw" name="Anzeige">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_WL0B8ILtEeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>
@@ -59,7 +62,6 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="_79xyUILtEeWXffnGZNcxQw" name="name" visibility="private">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
         </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_D1EesILuEeWXffnGZNcxQw" name="printStream" visibility="private" type="_V7pJ4ILrEeWXffnGZNcxQw"/>
         <ownedOperation xmi:type="uml:Operation" xmi:id="_KHUf4ILuEeWXffnGZNcxQw" name="Bahnhof">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_OHtMIILuEeWXffnGZNcxQw" name="name">
             <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
@@ -74,14 +76,6 @@
         </ownedOperation>
         <ownedOperation xmi:type="uml:Operation" xmi:id="_icsvUILuEeWXffnGZNcxQw" name="getName">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_nTZ_kILuEeWXffnGZNcxQw" name="name" direction="return">
-            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
-          </ownedParameter>
-        </ownedOperation>
-        <ownedOperation xmi:type="uml:Operation" xmi:id="_wzvtYILuEeWXffnGZNcxQw" name="getPrintStream">
-          <ownedParameter xmi:type="uml:Parameter" xmi:id="_1jbIkILuEeWXffnGZNcxQw" name="printStream" type="_V7pJ4ILrEeWXffnGZNcxQw" direction="return"/>
-        </ownedOperation>
-        <ownedOperation xmi:type="uml:Operation" xmi:id="_300jcILuEeWXffnGZNcxQw" name="println">
-          <ownedParameter xmi:type="uml:Parameter" xmi:id="_7WfTYILuEeWXffnGZNcxQw" name="string">
             <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
           </ownedParameter>
         </ownedOperation>
@@ -184,8 +178,8 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_lXFtwIL3EeWXffnGZNcxQw" name="de.hdm.bahnhofsteuerung.event">
       <packagedElement xmi:type="uml:Class" xmi:id="_yzxVUIL3EeWXffnGZNcxQw" name="ZugEvent" isAbstract="true">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_ARrE4IL4EeWXffnGZNcxQw" name="gleis" visibility="protected" type="_EnSbQILtEeWXffnGZNcxQw"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_HNb9IIL4EeWXffnGZNcxQw" name="zug" visibility="protected" type="_F_AcIILtEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ARrE4IL4EeWXffnGZNcxQw" name="gleis" visibility="private" type="_EnSbQILtEeWXffnGZNcxQw"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_HNb9IIL4EeWXffnGZNcxQw" name="zug" visibility="private" type="_F_AcIILtEeWXffnGZNcxQw"/>
         <ownedOperation xmi:type="uml:Operation" xmi:id="_R4LokIL4EeWXffnGZNcxQw" name="getGleis">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_V4zlYIL4EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw" direction="return"/>
         </ownedOperation>
@@ -194,6 +188,8 @@
         </ownedOperation>
       </packagedElement>
       <packagedElement xmi:type="uml:Class" xmi:id="_0PdQMIL3EeWXffnGZNcxQw" name="Zugabfahrt">
+        <generalization xmi:type="uml:Generalization" xmi:id="_qd9FkIPWEeWx0r0aejMVoA" general="_yzxVUIL3EeWXffnGZNcxQw"/>
+        <generalization xmi:type="uml:Generalization" xmi:id="_HHBRIIbfEeW3MoIiKGXm2A" general="_yzxVUIL3EeWXffnGZNcxQw"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_lHNCMIL4EeWXffnGZNcxQw" name="ziel" visibility="private">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
         </ownedAttribute>
@@ -212,7 +208,6 @@
       </packagedElement>
       <packagedElement xmi:type="uml:Class" xmi:id="_2BlVIIL3EeWXffnGZNcxQw" name="Zugdurchfahrt">
         <generalization xmi:type="uml:Generalization" xmi:id="_Fb9CUIMBEeWXffnGZNcxQw" general="_yzxVUIL3EeWXffnGZNcxQw"/>
-        <generalization xmi:type="uml:Generalization" xmi:id="_GQh54IMBEeWXffnGZNcxQw" general="_0PdQMIL3EeWXffnGZNcxQw"/>
         <ownedOperation xmi:type="uml:Operation" xmi:id="_45p5AIL4EeWXffnGZNcxQw" name="Zugdurchfahrt">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_9yt5sIL4EeWXffnGZNcxQw" name="zug" type="_F_AcIILtEeWXffnGZNcxQw"/>
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_EvzAkIL5EeWXffnGZNcxQw" name="gleis" type="_EnSbQILtEeWXffnGZNcxQw"/>

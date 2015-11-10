@@ -22,6 +22,11 @@ import de.hdm.bahnhofsteuerung.bahnhof.Bahnhof;
 import de.hdm.bahnhofsteuerung.bahnhof.Fahrplan;
 import de.hdm.bahnhofsteuerung.bahnhof.Zug;
 
+/**
+ * Steuert den Ablauf des Programms und enthält die main-Funktion.
+ * @author Andreas Herrmann
+ *
+ */
 @SuppressWarnings("restriction")
 public class Bahnhofsteuerung {
 	private static KieSession kSession;
