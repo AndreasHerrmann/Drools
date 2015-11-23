@@ -1,0 +1,75 @@
+//created on: 13.10.2015
+package de.hdm.bahnhofsteuerung
+
+//list any import classes here.
+import de.hdm.bahnhofsteuerung.bahnhof.*;
+import de.hdm.bahnhofsteuerung.event.*
+
+
+//declare any global variables here
+
+declare Zugeinfahrt
+	@role(event)
+end
+
+declare Zugdurchfahrt
+	@role(event)
+end
+
+declare Zugabfahrt
+	@role(event)
+end
+
+declare ZugKollision
+	@role(event)
+end
+
+
+rule "Zugeinfahrt bekanntgeben"
+	no-loop
+    when
+        $ze: Zugeinfahrt()
+    then
+        $ze.getGleis().getAnzeige().anzeigen("Der Zug "+$ze.getZug().getNummer()
+        +" nach "+$ze.getZiel()+" ist eingefahren."); 
+end
+
+rule "Zugabfahrt bekanntgeben"
+	no-loop
+    when
+        $za: Zugabfahrt()
+    then
+		$za.getGleis().getAnzeige().anzeigen("Der Zug "+$za.getZug().getNummer()
+		+" nach "+$za.getZiel()+" ist abgefahren");
+end
+
+rule "Kollisionen erkennen"
+	salience(100)
+	no-loop
+	when
+		$ze1: Zugeinfahrt() and
+		$ze2: Zugeinfahrt(this after $ze1 && gleis==$ze1.getGleis()) and 
+		not Zugabfahrt(this after $ze1 && zug==$ze1.getZug() && gleis==$ze1.getGleis())
+	then
+		insert(new ZugKollision($ze1.getZug(),$ze2.getZug(),$ze1.getGleis()));
+end
+
+rule "Kollision ausgeben"
+	salience(100)
+	no-loop
+	when
+		$zk: ZugKollision()
+	then
+	System.out.println($zk.getGleis().getBahnhof().getName()
+	+": Die Zuege "+$zk.getZug().getNummer()+" und "
+	+$zk.getZug2().getNummer()+ " werden auf Gleis "
+	+$zk.getGleis().getNummer()+" kollidieren!");
+end
+
+rule "Zugdurchfahrt anzeigen"
+	when
+		$zd: Zugdurchfahrt()
+	then
+		$zd.getGleis().getAnzeige().anzeigen("Der Zug "+$zd.getZug().getNummer()
+        +" fährt durch.");
+end
