@@ -1,0 +1,61 @@
+//created on: 26.10.2015
+package de.hdm.stockprice
+
+//list any import classes here.
+import de.hdm.stockprice.Stock;
+import de.hdm.stockprice.event.*;
+
+
+//declare any global variables here
+declare StockEvent
+	@role(event)
+	@duration(1d)
+end
+
+declare Wertverlust
+	@role(event)
+	@duration(1d)
+end
+
+
+
+rule "Tage finden, an denen die Aktie an Wert verloren hat"
+
+    when
+        $stockEvent: StockEvent(openValue>closeValue)
+    then
+        insert(new Wertverlust($stockEvent,($stockEvent.getOpenValue()-$stockEvent.getCloseValue())));
+
+end
+
+rule "Tage finden an denen die Aktie mindestens 10% unter dem Durchschnitt der letzten 100 Tage lag"
+	when
+		$stockEvent: StockEvent ($dailyAve: ((dailyHigh+dailyLow)/2), $stock: stock) and
+		not StockEvent(stock==$stock && this after $stockEvent)
+		Number($value: (floatValue*0.9), $value>$dailyAve) from accumulate( StockEvent($stock==stock, $close:closeValue)over window:time(100d)
+		,average($close)) 
+	then
+		System.out.println($stock.getName()+" lag mindestens 10% unter dem Durschnitt der letzten 100 Tage");
+end
+
+rule "Tage finden an denen Microsoft und IBM gefallen sind"
+	no-loop
+	when
+		$wv: Wertverlust(getStockEvent().getStock().getSymbol()=="ibm") and
+			 Wertverlust(getStockEvent().getStock().getSymbol()=="msft" && this coincides $wv)
+	then
+		System.out.println("Heute sind IBM und Microsoft gefallen");
+end
+
+rule "Aktientrend"
+	no-loop
+	when
+	$se: StockEvent($stock:stock) and
+	not StockEvent($stock==stock && this after $se)
+		 Number($trend: floatValue) from accumulate( StockEvent(stock==$stock, $wertaenderung: (closeValue-openValue)) 
+		 over window:time(5d), average($wertaenderung))
+	then
+	if($trend>0){$stock.setTrend(Trend.steigend);}
+	if($trend<0){$stock.setTrend(Trend.fallend);}
+	else{$stock.setTrend(Trend.stagnierend);}
+end
