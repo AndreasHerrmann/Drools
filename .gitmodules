@@ -1,0 +1,6 @@
+[submodule "RESTfulNetzverwaltung"]
+	path = RESTfulNetzverwaltung
+	url = https://github.com/AndreasHerrmann/Praktikum.git
+[submodule "Netzverwaltung"]
+	path = Netzverwaltung
+	url = https://github.com/AndreasHerrmann/Praktikum.git

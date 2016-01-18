@@ -16,7 +16,7 @@ public class OrderManagerClient {
 		Item sellerie = new Item("Sellerie",2.99F);
 		
 		ResteasyClient client = new ResteasyClientBuilder().build();
-		ResteasyWebTarget zielAdresse = client.target("http://localhost:8080/OrderManagerRESTeasy/resteasy");
+		ResteasyWebTarget zielAdresse = client.target("http://localhost:8080/_ah/api/ordermanager/v1");
 		//Anfragen des Clients über das Proxy Interface umleiten
 		RestEasyProxyInterface repi = zielAdresse.proxy(RestEasyProxyInterface.class);
 		
