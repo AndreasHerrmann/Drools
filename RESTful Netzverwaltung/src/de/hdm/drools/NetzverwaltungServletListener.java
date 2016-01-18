@@ -14,6 +14,7 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+		new ContextBuilder();
 		kieSessionThread = new KnowledgeBaseThread();
 		kieSessionThread.start();
 		System.out.println("KieSession gestartet");

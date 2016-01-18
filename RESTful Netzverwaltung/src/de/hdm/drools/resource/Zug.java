@@ -2,13 +2,13 @@ package de.hdm.drools.resource;
 
 import java.net.URI;
 
-public class Knotenpunkt extends Resource {
-	protected URI adresse;
+public class Zug extends Resource {
+	private URI adresse;
 	
-	public Knotenpunkt(){
+	public Zug(){
 		
 	}
-	public Knotenpunkt(long iD){
+	public Zug(long iD){
 		this.iD=iD;
 	}
 	public URI getAdresse() {
@@ -17,9 +17,8 @@ public class Knotenpunkt extends Resource {
 	public void setAdresse(URI adresse) {
 		this.adresse = adresse;
 	}
-	
-	public boolean equals(Knotenpunkt knotenpunkt){
-		if(this.iD==knotenpunkt.getiD()){
+	public boolean equals(Zug zug){
+		if(this.iD==zug.getiD()){
 			return true;
 		}
 		else{
