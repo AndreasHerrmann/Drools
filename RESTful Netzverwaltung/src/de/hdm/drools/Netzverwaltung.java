@@ -30,6 +30,14 @@ import de.hdm.drools.resource.Knotenpunkt;
 import de.hdm.drools.resource.Strecke;
 import de.hdm.drools.resource.Zug;
 
+/**
+ * REST-Schnittstelle der Netzverwaltung, geschrieben in Jersey.
+ * @author Andreas Herrmann
+ * @param knotenpunkte Vector, der alle bekannten Knotenpunkte enthält
+ * @param bahnhoefe Vector, der alle bekannten Bahnhöfe enthält
+ * @param zuege Vector, der alle bekannten Züge enthält
+ * @param strecken Vector, der alle bekannten Strecken enthält
+ */
 @Path("/")
 public class Netzverwaltung {
 	private static Vector<Knotenpunkt> knotenpunkte = new Vector<Knotenpunkt>();
@@ -37,15 +45,31 @@ public class Netzverwaltung {
 	private static Vector<Zug> zuege = new Vector<Zug>();
 	private static Vector<Strecke> strecken = new Vector<Strecke>();
 	
+	/**
+	 * Fügt dem Vector knotenpunkte einen neuen Knotenpunkt hinzu.
+	 * @param knotenpunkt Der Knotenpunkt, der hinzugefügt werden soll
+	 */
 	public static void addKnotenpunkt(Knotenpunkt knotenpunkt){
 		knotenpunkte.add(knotenpunkt);
 	}
+	/**
+	 * Fügt dem Vector bahnhoefe einen neuen Bahnhof hinzu.
+	 * @param bahnhof Der Bahnhof, der hinzugefügt werden soll
+	 */
 	public static void addBahnhof(Bahnhof bahnhof){
 		bahnhoefe.add(bahnhof);
 	}
+	/**
+	 * Fügt dem Vector zuege einen neuen Zug hinzu.
+	 * @param zug Der Zug, der hinzugefügt werden soll
+	 */
 	public static void addZug(Zug zug){
 		zuege.add(zug);
 	}
+	/**
+	 * Fügt dem Vector strecken eine neue Strecke hinzu.
+	 * @param strecke Die Strecke, die hinzugefügt werden soll
+	 */
 	public static void addStrecke(Strecke strecke){
 		strecken.add(strecke);
 	}
@@ -180,7 +204,7 @@ public class Netzverwaltung {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public void fahrtAnfrageStellen(@Context HttpServletRequest req,
+	public void 	fahrtAnfrageStellen(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtAnfrage fahrtanfrage){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
@@ -203,7 +227,7 @@ public class Netzverwaltung {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public void fahrtBeginnMelden(@Context HttpServletRequest req,
+	public void 	fahrtBeginnMelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtBeginn fahrtbeginn){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
@@ -311,6 +335,44 @@ public class Netzverwaltung {
 				}
 			}
 			return Response.status(HttpStatus.NOT_FOUND_404).build();
+		}
+	}
+	
+	@Path("/strecke/zu/knotenpunkt")
+	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findStreckeZuKnotenpunktHin(@NotNull Knotenpunkt knotenpunkt){
+		Vector<Strecke> gefundeneStrecken = new Vector<Strecke>();
+		for(int i=0;i<strecken.size();i++){
+			if(strecken.get(i).getZiel().equals(knotenpunkt)){
+				gefundeneStrecken.add(strecken.get(i));
+			}
+		}
+		if(gefundeneStrecken.size()<1){
+			return Response.noContent().build();
+		}
+		else{
+			return Response.ok(gefundeneStrecken.toArray()).build();
+		}
+	}
+	
+	@Path("/strecke/von/knotenpunkt")
+	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response findStreckeVonKnotenpunktWeg(@NotNull Knotenpunkt knotenpunkt){
+		Vector<Strecke> gefundeneStrecken = new Vector<Strecke>();
+		for(int i=0;i<strecken.size();i++){
+			if(strecken.get(i).getStart().equals(knotenpunkt)){
+				gefundeneStrecken.add(strecken.get(i));
+			}
+		}
+		if(gefundeneStrecken.size()<1){
+			return Response.noContent().build();
+		}
+		else{
+			return Response.ok(gefundeneStrecken.toArray()).build();
 		}
 	}
 }

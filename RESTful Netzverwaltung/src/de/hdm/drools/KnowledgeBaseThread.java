@@ -20,6 +20,13 @@ import de.hdm.drools.resource.Bahnhof;
 import de.hdm.drools.resource.Knotenpunkt;
 import de.hdm.drools.resource.Zug;
 
+/**
+ * Der Thread, in dem die KnowledgeBase läuft. Generalisiert java.lang.Thread.
+ * Wird beim Start des Servlets aufgerufen.
+ * @author Andreas Herrmann
+ * @param kSession Die KieSession, die in dem Thread abläuft
+ *
+ */
 public class KnowledgeBaseThread extends Thread {
 	private static KieSession kSession=null;
 	//Startet die KieSession
