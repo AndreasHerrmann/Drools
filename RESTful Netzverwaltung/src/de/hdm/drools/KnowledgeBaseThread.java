@@ -34,7 +34,7 @@ public class KnowledgeBaseThread extends Thread {
 		try {
 			KieServices kService = KieServices.Factory.get();
 	    	KieFileSystem kfs = kService.newKieFileSystem();
-	    	kfs.write(kService.getResources().newClassPathResource("de/hdm/drools/Rules.drl"));
+	    	kfs.write(kService.getResources().newClassPathResource("de/hdm/drools/Regeln.drl"));
 	    	KieBuilder kieBuilder = kService.newKieBuilder(kfs).buildAll();
 	        Results results = kieBuilder.getResults();
 	        if( results.hasMessages( Message.Level.ERROR ) )

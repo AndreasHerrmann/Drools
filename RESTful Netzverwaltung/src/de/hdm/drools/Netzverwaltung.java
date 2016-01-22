@@ -11,6 +11,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -91,6 +94,11 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response knotenpunktAnmelden(@Context HttpServletRequest req){
 		URI adresse = URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		for(int j=0;j<bahnhoefe.size();j++){
+			if(adresse.equals(bahnhoefe.get(j))){
+				return Response.status(HttpStatus.BAD_REQUEST_400).build();
+			}
+		}
 		for(int i=0;i<knotenpunkte.size();i++){
 			if(knotenpunkte.get(i).getAdresse()==null){
 				knotenpunkte.get(i).setAdresse(adresse);
@@ -109,8 +117,8 @@ public class Netzverwaltung {
 	public Response knotenpunktAbmelden(@Context HttpServletRequest req,
 			@NotNull Knotenpunkt knotenpunkt){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=knotenpunkt.getAdresse()){
-			return Response.status(HttpStatus.UNAUTHORIZED_401).build();
+		if(!adresse.equals(knotenpunkt.getAdresse())){
+			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
 			for(int i=0;i<knotenpunkte.size();i++){
@@ -129,11 +137,27 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response bahnhofAnmelden(@Context HttpServletRequest req){
 		URI adresse = URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		for(int j=0;j<bahnhoefe.size();j++){
+			if(adresse.equals(bahnhoefe.get(j))){
+				return Response.status(HttpStatus.BAD_REQUEST_400).build();
+			}
+		}
 		for(int i=0;i<bahnhoefe.size();i++){
 			if(bahnhoefe.get(i).getAdresse()==null){
 				bahnhoefe.get(i).setAdresse(adresse);
 				Bahnhof bahnhof=bahnhoefe.get(i);
 				KnowledgeBaseThread.bahnhofAnmelden(bahnhof);
+				for(int j=0;j<bahnhof.getKnotenpunkte().length;j++){
+					if(bahnhof.getKnotenpunkt(j).getAdresse()!=null){
+						Client client = ClientBuilder.newClient();
+						WebTarget knotenpunktAdresse = 
+								client.target(bahnhof.getKnotenpunkt(j).getAdresse());
+						knotenpunktAdresse =  knotenpunktAdresse.path("/erneutAnmelden");
+						knotenpunktAdresse.request().post(null);
+						
+					}
+					bahnhof.getKnotenpunkt(j).setAdresse(bahnhof.getAdresse());
+				}
 				return Response.ok(bahnhof).build();
 			}
 		}
@@ -147,8 +171,8 @@ public class Netzverwaltung {
 	public Response bahnhofAbmelden(@Context HttpServletRequest req,
 			@NotNull Bahnhof bahnhof){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=bahnhof.getAdresse()){
-			return Response.status(HttpStatus.UNAUTHORIZED_401).build();
+		if(!adresse.equals(bahnhof.getAdresse())){
+			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
 			for(int i=0;i<bahnhoefe.size();i++){
@@ -167,6 +191,11 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response zugAnmelden(@Context HttpServletRequest req){
 		URI adresse = URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		for(int j=0;j<bahnhoefe.size();j++){
+			if(adresse.equals(bahnhoefe.get(j))){
+				return Response.status(HttpStatus.BAD_REQUEST_400).build();
+			}
+		}
 		for(int i=0;i<zuege.size();i++){
 			if(zuege.get(i).getAdresse()==null){
 				zuege.get(i).setAdresse(adresse);
@@ -185,8 +214,8 @@ public class Netzverwaltung {
 	public Response zugAbmelden(@Context HttpServletRequest req,
 			@NotNull Zug zug){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=zug.getAdresse()){
-			return Response.status(HttpStatus.UNAUTHORIZED_401).build();
+		if(!adresse.equals(zug.getAdresse())){
+			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
 			for(int i=0;i<zuege.size();i++){
@@ -208,8 +237,8 @@ public class Netzverwaltung {
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtAnfrage fahrtanfrage){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=fahrtanfrage.getZug().getAdresse()){
-			asyncResponse.resume(Response.status(HttpStatus.UNAUTHORIZED_401).build());
+		if(!adresse.equals(fahrtanfrage.getZug().getAdresse())){
+			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
 		}
 		else{
 			for(int i=0;i<strecken.size();i++){
@@ -231,8 +260,8 @@ public class Netzverwaltung {
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtBeginn fahrtbeginn){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=fahrtbeginn.getZug().getAdresse()){
-			asyncResponse.resume(Response.status(HttpStatus.UNAUTHORIZED_401).build());
+		if(!adresse.equals(fahrtbeginn.getZug().getAdresse())){
+			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
 		}
 		else{
 			for(int i=0;i<strecken.size();i++){
@@ -252,8 +281,8 @@ public class Netzverwaltung {
 	public Response fahrtAbschlussMelden(@Context HttpServletRequest req,
 			@NotNull FahrtAbschluss fahrtabschluss){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=fahrtabschluss.getZug().getAdresse()){
-			return Response.status(HttpStatus.UNAUTHORIZED_401).build();
+		if(!adresse.equals(fahrtabschluss.getZug().getAdresse())){
+			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
 			for(int i=0;i<strecken.size();i++){
@@ -273,8 +302,8 @@ public class Netzverwaltung {
 	public Response lebenszeichenAbsetzen(@Context HttpServletRequest req,
 			@NotNull Lebenszeichen lebenszeichen){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
-		if(adresse!=lebenszeichen.getZug().getAdresse()){
-			return Response.status(HttpStatus.UNAUTHORIZED_401).build();
+		if(!adresse.equals(lebenszeichen.getZug().getAdresse())){
+			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
 			for(int i=0;i<strecken.size();i++){

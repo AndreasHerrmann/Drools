@@ -17,6 +17,14 @@ public class Bahnhof extends Knotenpunkt {
 	public Knotenpunkt[] getKnotenpunkte() {
 		return knotenpunkte;
 	}
+	public Knotenpunkt getKnotenpunkt(int index){
+		if(knotenpunkte.length<=index){
+			return null;
+		}
+		else{
+			return knotenpunkte[index];
+		}
+	}
 	public boolean equals(Bahnhof bahnhof){
 		if(this.iD==bahnhof.getiD()){
 			return true;
