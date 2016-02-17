@@ -14,8 +14,7 @@ import javax.servlet.ServletContextListener;
  */
 public class NetzverwaltungServletListener implements ServletContextListener {
 	private static KnowledgeBaseThread kieSessionThread;
-	private static Logger logger;
-	
+
 	/**
 	 * Wird beim Beenden des Servlets automatisch aufgerufen. Hält den
 	 * KnowledgeBaseThread an und löscht die Referenz auf ihn,
@@ -28,10 +27,6 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		kieSessionThread.interrupt();
 		kieSessionThread=null;
-		if(logger!=null){
-			logger.interrupt();
-			logger=null;
-		}
 
 	}
 
@@ -43,13 +38,8 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		if(Config.logEvents){
-			logger = new Logger();
-			logger.start();	
-		}
-		new ContextBuilder();
 		kieSessionThread = new KnowledgeBaseThread();
 		kieSessionThread.start();
-
+		new ContextBuilder();
 	}
 }

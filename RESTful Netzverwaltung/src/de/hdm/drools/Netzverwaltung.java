@@ -11,9 +11,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -22,6 +19,9 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.jetty.http.HttpStatus;
 
+import de.hdm.drools.anmeldung.BahnhofAnmeldung;
+import de.hdm.drools.anmeldung.KnotenpunktAnmeldung;
+import de.hdm.drools.anmeldung.ZugAnmeldung;
 import de.hdm.drools.nachricht.FahrtAbschluss;
 import de.hdm.drools.nachricht.FahrtAnfrage;
 import de.hdm.drools.nachricht.FahrtAnfrageMitAsyncResponse;
@@ -54,6 +54,7 @@ public class Netzverwaltung {
 	 */
 	public static void addKnotenpunkt(Knotenpunkt knotenpunkt){
 		knotenpunkte.add(knotenpunkt);
+		KnowledgeBaseThread.addKnotenpunkt(knotenpunkt);
 	}
 	/**
 	 * Fügt dem Vector bahnhoefe einen neuen Bahnhof hinzu.
@@ -61,6 +62,7 @@ public class Netzverwaltung {
 	 */
 	public static void addBahnhof(Bahnhof bahnhof){
 		bahnhoefe.add(bahnhof);
+		KnowledgeBaseThread.addBahnhof(bahnhof);
 	}
 	/**
 	 * Fügt dem Vector zuege einen neuen Zug hinzu.
@@ -68,6 +70,7 @@ public class Netzverwaltung {
 	 */
 	public static void addZug(Zug zug){
 		zuege.add(zug);
+		KnowledgeBaseThread.addZug(zug);
 	}
 	/**
 	 * Fügt dem Vector strecken eine neue Strecke hinzu.
@@ -75,39 +78,21 @@ public class Netzverwaltung {
 	 */
 	public static void addStrecke(Strecke strecke){
 		strecken.add(strecke);
-	}
-	public static Vector<Knotenpunkt> getKnotenpunkte() {
-		return knotenpunkte;
-	}
-	public static Vector<Bahnhof> getBahnhoefe() {
-		return bahnhoefe;
-	}
-	public static Vector<Zug> getZuege() {
-		return zuege;
-	}
-	public static Vector<Strecke> getStrecken() {
-		return strecken;
+		KnowledgeBaseThread.addStrecke(strecke);
 	}
 	
 	@Path("/knotenpunkt/anmelden")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response knotenpunktAnmelden(@Context HttpServletRequest req){
-		URI adresse = URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+	public void knotenpunktAnmelden(@Context HttpServletRequest req,
+			@Suspended final AsyncResponse asyncResponse){
+		URI adresse = URI.create(req.getRemoteAddr());
 		for(int j=0;j<bahnhoefe.size();j++){
 			if(adresse.equals(bahnhoefe.get(j))){
-				return Response.status(HttpStatus.BAD_REQUEST_400).build();
+				asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 			}
 		}
-		for(int i=0;i<knotenpunkte.size();i++){
-			if(knotenpunkte.get(i).getAdresse()==null){
-				knotenpunkte.get(i).setAdresse(adresse);
-				Knotenpunkt knotenpunkt=knotenpunkte.get(i);
-				KnowledgeBaseThread.knotenpunktAnmelden(knotenpunkt);
-				return Response.ok(knotenpunkt).build();
-			}
-		}
-		return Response.serverError().build();
+		KnowledgeBaseThread.knotenpunktAnmelden(new KnotenpunktAnmeldung(asyncResponse, adresse));		
 	}
 	
 	@Path("/knotenpunkt/abmelden")
@@ -116,7 +101,7 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response knotenpunktAbmelden(@Context HttpServletRequest req,
 			@NotNull Knotenpunkt knotenpunkt){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(knotenpunkt.getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -135,33 +120,15 @@ public class Netzverwaltung {
 	@Path("/bahnhof/anmelden")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response bahnhofAnmelden(@Context HttpServletRequest req){
-		URI adresse = URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+	public void bahnhofAnmelden(@Context HttpServletRequest req,
+			@Suspended final AsyncResponse asyncResponse){
+		URI adresse = URI.create(req.getRemoteAddr());
 		for(int j=0;j<bahnhoefe.size();j++){
 			if(adresse.equals(bahnhoefe.get(j))){
-				return Response.status(HttpStatus.BAD_REQUEST_400).build();
+				asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 			}
 		}
-		for(int i=0;i<bahnhoefe.size();i++){
-			if(bahnhoefe.get(i).getAdresse()==null){
-				bahnhoefe.get(i).setAdresse(adresse);
-				Bahnhof bahnhof=bahnhoefe.get(i);
-				KnowledgeBaseThread.bahnhofAnmelden(bahnhof);
-				for(int j=0;j<bahnhof.getKnotenpunkte().length;j++){
-					if(bahnhof.getKnotenpunkt(j).getAdresse()!=null){
-						Client client = ClientBuilder.newClient();
-						WebTarget knotenpunktAdresse = 
-								client.target(bahnhof.getKnotenpunkt(j).getAdresse());
-						knotenpunktAdresse =  knotenpunktAdresse.path("/erneutAnmelden");
-						knotenpunktAdresse.request().post(null);
-						
-					}
-					bahnhof.getKnotenpunkt(j).setAdresse(bahnhof.getAdresse());
-				}
-				return Response.ok(bahnhof).build();
-			}
-		}
-		return Response.serverError().build();
+		KnowledgeBaseThread.bahnhofAnmelden(new BahnhofAnmeldung(asyncResponse, adresse));
 	}
 	
 	@Path("/bahnhof/abmelden")
@@ -170,7 +137,7 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response bahnhofAbmelden(@Context HttpServletRequest req,
 			@NotNull Bahnhof bahnhof){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(bahnhof.getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -189,22 +156,15 @@ public class Netzverwaltung {
 	@Path("/zug/anmelden")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response zugAnmelden(@Context HttpServletRequest req){
-		URI adresse = URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+	public void zugAnmelden(@Context HttpServletRequest req,
+			@Suspended final AsyncResponse asyncResponse){
+		URI adresse = URI.create(req.getRemoteAddr());
 		for(int j=0;j<bahnhoefe.size();j++){
 			if(adresse.equals(bahnhoefe.get(j))){
-				return Response.status(HttpStatus.BAD_REQUEST_400).build();
+				asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 			}
 		}
-		for(int i=0;i<zuege.size();i++){
-			if(zuege.get(i).getAdresse()==null){
-				zuege.get(i).setAdresse(adresse);
-				Zug zug=zuege.get(i);
-				KnowledgeBaseThread.zugAnmelden(zug);
-				return Response.ok(zug).build();
-			}
-		}
-		return Response.serverError().build();
+		KnowledgeBaseThread.zugAnmelden(new ZugAnmeldung(asyncResponse, adresse));
 	}
 	
 	@Path("/zug/abmelden")
@@ -213,7 +173,7 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response zugAbmelden(@Context HttpServletRequest req,
 			@NotNull Zug zug){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(zug.getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -236,7 +196,7 @@ public class Netzverwaltung {
 	public void 	fahrtAnfrageStellen(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtAnfrage fahrtanfrage){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(fahrtanfrage.getZug().getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
 		}
@@ -259,7 +219,7 @@ public class Netzverwaltung {
 	public void 	fahrtBeginnMelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtBeginn fahrtbeginn){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(fahrtbeginn.getZug().getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
 		}
@@ -280,7 +240,7 @@ public class Netzverwaltung {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response fahrtAbschlussMelden(@Context HttpServletRequest req,
 			@NotNull FahrtAbschluss fahrtabschluss){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(fahrtabschluss.getZug().getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -301,7 +261,7 @@ public class Netzverwaltung {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response lebenszeichenAbsetzen(@Context HttpServletRequest req,
 			@NotNull Lebenszeichen lebenszeichen){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(lebenszeichen.getZug().getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -325,7 +285,7 @@ public class Netzverwaltung {
 		}
 		else{
 			for(int i=0; i<knotenpunkte.size();i++){
-				if(knotenpunkte.get(i).getiD()==id){
+				if(knotenpunkte.get(i).getID()==id){
 					return Response.ok(knotenpunkte.get(i)).build();
 				}
 			}
@@ -342,7 +302,7 @@ public class Netzverwaltung {
 		}
 		else{
 			for(int i=0; i<bahnhoefe.size();i++){
-				if(bahnhoefe.get(i).getiD()==id){
+				if(bahnhoefe.get(i).getID()==id){
 					return Response.ok(bahnhoefe.get(i)).build();
 				}
 			}
@@ -359,7 +319,7 @@ public class Netzverwaltung {
 		}
 		else{
 			for(int i=0; i<zuege.size();i++){
-				if(zuege.get(i).getiD()==id){
+				if(zuege.get(i).getID()==id){
 					return Response.ok(zuege.get(i)).build();
 				}
 			}

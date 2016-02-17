@@ -4,6 +4,7 @@ import javax.ws.rs.container.AsyncResponse;
 
 public class FahrtAnfrageMitAsyncResponse extends FahrtAnfrage {
 	private AsyncResponse asyncResponse;
+	private boolean istErledigt=false;
 
 	public FahrtAnfrageMitAsyncResponse(FahrtAnfrage fahrtanfrage,
 			AsyncResponse asyncResponse){
@@ -13,5 +14,11 @@ public class FahrtAnfrageMitAsyncResponse extends FahrtAnfrage {
 	}
 	public AsyncResponse getAsyncResponse() {
 		return asyncResponse;
+	}
+	public boolean getIstErledigt(){
+		return istErledigt;
+	}
+	public void setIstErledigt(boolean istErledigt){
+		this.istErledigt=istErledigt;
 	}
 }

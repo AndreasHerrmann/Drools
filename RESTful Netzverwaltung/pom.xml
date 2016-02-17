@@ -61,5 +61,10 @@
   		<artifactId>knowledge-internal-api</artifactId>
   		<version>5.6.0.Final</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.glassfish.jersey.containers</groupId>
+  		<artifactId>jersey-container-jetty-http</artifactId>
+  		<version>2.22.1</version>
+  	</dependency>
   </dependencies>
 </project>

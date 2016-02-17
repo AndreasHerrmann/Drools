@@ -19,7 +19,7 @@ public class Strecke extends Resource {
 		return ziel;
 	}
 	public boolean equals(Strecke strecke){
-		if(this.iD==strecke.getiD()){
+		if(this.iD==strecke.getID()){
 			return true;
 		}
 		else{

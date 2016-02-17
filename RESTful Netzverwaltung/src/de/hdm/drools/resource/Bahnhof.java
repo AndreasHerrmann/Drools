@@ -26,11 +26,19 @@ public class Bahnhof extends Knotenpunkt {
 		}
 	}
 	public boolean equals(Bahnhof bahnhof){
-		if(this.iD==bahnhof.getiD()){
+		if(this.iD==bahnhof.getID()){
 			return true;
 		}
 		else{
 			return false;
 		}
+	}
+	public boolean equals(Knotenpunkt knotenpunkt){
+		for(int i=0; i<this.knotenpunkte.length; i++){
+			if(this.knotenpunkte[i].equals(knotenpunkt)){
+				return true;
+			}
+		}
+		return false;
 	}
 }
