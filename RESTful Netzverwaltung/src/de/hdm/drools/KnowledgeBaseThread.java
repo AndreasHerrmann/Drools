@@ -39,7 +39,7 @@ public class KnowledgeBaseThread extends Thread {
     	kfs.write(kService.getResources().newClassPathResource("de/hdm/drools/Rules.drl"));
     	KieBuilder kieBuilder = kService.newKieBuilder(kfs).buildAll();
         Results results = kieBuilder.getResults();
-        if( results.hasMessages( Message.Level.ERROR ) )
+        if( results.hasMessages(Message.Level.ERROR))
         	{
             System.out.println( results.getMessages() );
             throw new IllegalStateException( "### errors ###" );

@@ -1,5 +1,7 @@
 package de.hdm.drools.resource;
 
+import java.net.URI;
+
 public class Bahnhof extends Knotenpunkt {
 	private String name;
 	private Knotenpunkt[] knotenpunkte;
@@ -40,5 +42,11 @@ public class Bahnhof extends Knotenpunkt {
 			}
 		}
 		return false;
+	}
+	public void setAdresse(URI adresse){
+		this.adresse=adresse;
+		for(int i=0;i<knotenpunkte.length;i++){
+			knotenpunkte[i].setAdresse(adresse);
+		}
 	}
 }

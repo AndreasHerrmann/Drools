@@ -79,8 +79,8 @@ rule "Erste Fahrtanfrage beantworten"
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
 		$strecke:Strecke(iD==$fahrtAnfrage.strecke.iD) and
-		not FahrtBeginnMitAsyncResponse(strecke.iD==$strecke.iD) and
-		not FahrtAbschluss(strecke.iD==$strecke.iD)
+		not FahrtBeginnMitAsyncResponse(strecke.iD==$strecke.iD && this before $fahrtAnfrage) and
+		not FahrtAbschluss(strecke.iD==$strecke.iD && this before $fahrtAnfrage)
 	then
 		$fahrtAnfrage.setIstErledigt(true);
 		update($fahrtAnfrage);
@@ -134,10 +134,10 @@ end
 rule "Fahrtbeginn positiv beantworten"
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
-		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD && this before $fahrtBeginn) and
-		exists FahrtErlaubnis(strecke.iD==$fahrtBeginn.strecke.iD && zug.iD==$fahrtBeginn.zug.iD && this after $fahrtAnfrage && this before $fahrtBeginn) over window:time(2m) and
-		$fahrtabschluss:FahrtAbschluss(strecke.iD==$fahrtBeginn.strecke.iD) and
-		not FahrtBeginnMitAsyncResponse(strecke.iD==$fahrtabschluss.strecke.iD && istErledigt==true && positivBeantwortet==true && this after $fahrtabschluss)
+		exists FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD) over window:time(2m) and
+		exists FahrtErlaubnis(zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD) over window:time(2m) and
+		not ($fahrtBeginnZwei:FahrtBeginn(strecke.iD==$fahrtBeginn.strecke.iD && this before $fahrtBeginn) and
+		not FahrtAbschluss(strecke.iD==$fahrtBeginnZwei.strecke.iD && zug.iD==$fahrtBeginnZwei.zug.iD && this after $fahrtBeginnZwei))
 	then
 		$fahrtBeginn.setIstErledigt(true);
 		$fahrtBeginn.setPositivBeantwortet(true);
