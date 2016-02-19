@@ -4,17 +4,21 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 public class KnotenpunktServletListener implements ServletContextListener {
-
+	private static KnowledgeBaseThread kieSessionThread;
+	
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		// TODO Auto-generated method stub
-
+		KnotenpunktController.abmelden();
+		kieSessionThread.interrupt();
+		kieSessionThread=null;
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		// TODO Auto-generated method stub
-
+		kieSessionThread = new KnowledgeBaseThread();
+		kieSessionThread.start();
+		System.out.println("KieSession gestartet");
+		KnotenpunktController.anmelden();
 	}
 
 }

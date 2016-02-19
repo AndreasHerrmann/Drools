@@ -1,0 +1,97 @@
+//created on: 18.02.2016
+package de.hdm.drools
+
+//list any import classes here.
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response;
+import de.hdm.drools.resource.*;
+import de.hdm.drools.nachricht.*;
+
+declare Abfahrt
+	@role(event)
+end
+declare AuffahrtAnfrageMitAsyncResponse
+	@role(event)
+end
+declare AuffahrtMeldungMitAsyncResponse
+	@role(event)
+end
+
+rule "Erste AuffahrtAnfrage beantworten"
+	activation-group "AuffahrtAnfrage"
+    when
+       	$auffahrtAnfrage:AuffahrtAnfrageMitAsyncResponse(istErledigt==false) and
+       	not AuffahrtAnfrageMitAsyncResponse(istErledigt==true && this before $auffahrtAnfrage) and
+       	not Abfahrt()
+    then
+      	$auffahrtAnfrage.setIstErledigt(true);
+      	update($auffahrtAnfrage);
+      	$auffahrtAnfrage.getAsyncResponse().resume(Response.ok().build());
+end
+
+rule "AuffahrtAnfrage positiv beantworten"
+    activation-group "AuffahrtAnfrage"
+    when
+        $auffahrtAnfrage:AuffahrtAnfrageMitAsyncResponse(istErledigt==false) and
+        $auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==true) and
+        not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldung) and
+        exists Abfahrt(zug.iD==$auffahrtMeldung.zug.iD && this after $auffahrtMeldung)
+    then
+        $auffahrtAnfrage.setIstErledigt(true);
+      	update($auffahrtAnfrage);
+      	$auffahrtAnfrage.getAsyncResponse().resume(Response.ok().build());
+end
+
+rule "AuffahrtAnfrage negativ beantworten"
+	activation-group "AuffahrtAnfrage"
+	when
+		$auffahrtAnfrage:AuffahrtAnfrageMitAsyncResponse(istErledigt==false) and
+        $auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==true) and
+        not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldung) and
+        not Abfahrt(zug.iD==$auffahrtMeldung.zug.iD && this after $auffahrtMeldung)
+	then
+		$auffahrtAnfrage.setIstErledigt(true);
+      	update($auffahrtAnfrage);
+      	$auffahrtAnfrage.getAsyncResponse().cancel();
+end
+
+rule "Erste AuffahrtMeldung beantworten"
+	activation-group "AuffahrtMeldung"
+	when
+		$auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==false) and
+		AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$auffahrtMeldung.zug.iD && this before $auffahrtMeldung) over window:time(2m) and
+       	not Abfahrt() and
+       	not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this before $auffahrtMeldung)
+	then
+		$auffahrtMeldung.setIstErledigt(true);
+       	update($auffahrtMeldung);
+       	$auffahrtMeldung.getAsyncResponse().resume(Response.ok().build());
+end
+
+rule "AuffahrtMeldung positiv beantworten"
+	activation-group "AuffahrtMeldung"
+	when
+		$auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==false) and
+		exists AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$auffahrtMeldung.zug.iD && this before $auffahrtMeldung) over window:time(2m) and
+		$auffahrtMeldungDavor:AuffahrtMeldungMitAsyncResponse(istErledigt==true && this before $auffahrtMeldung) and
+		not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldungDavor) and
+		exists Abfahrt(zug.iD==$auffahrtMeldungDavor.zug.iD && this after $auffahrtMeldungDavor)
+	then
+		$auffahrtMeldung.setIstErledigt(true);
+		update($auffahrtMeldung);
+		$auffahrtMeldung.getAsyncResponse().resume(Response.ok().build());
+end
+
+rule "AuffahrtMeldung negativ beantworten"
+	activation-group "AuffahrtMeldung"
+	when
+		$auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==false) and
+		( not AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$auffahrtMeldung.zug.iD && this before $auffahrtMeldung) over window:time(2m) or
+		( $auffahrtMeldungDavor:AuffahrtMeldungMitAsyncResponse(istErledigt==true && this before $auffahrtMeldung) and
+			not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldungDavor) and
+			not Abfahrt(zug.iD==$auffahrtMeldungDavor.zug.iD && this after $auffahrtMeldungDavor)))
+	then
+		$auffahrtMeldung.setIstErledigt(true);
+		update($auffahrtMeldung);
+		$auffahrtMeldung.getAsyncResponse().cancel();
+end
