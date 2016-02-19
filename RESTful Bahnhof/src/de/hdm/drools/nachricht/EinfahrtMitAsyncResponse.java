@@ -4,6 +4,7 @@ import javax.ws.rs.container.AsyncResponse;
 
 public class EinfahrtMitAsyncResponse extends Einfahrt{
 	private AsyncResponse asyncResponse;
+	private boolean istErledigt=false;
 	
 	public EinfahrtMitAsyncResponse(Einfahrt fahrtbeginn,
 			AsyncResponse asyncResponse){
@@ -13,5 +14,11 @@ public class EinfahrtMitAsyncResponse extends Einfahrt{
 	}
 	public AsyncResponse getAsyncResponse(){
 		return asyncResponse;
+	}
+	public boolean getIstErledigt() {
+		return istErledigt;
+	}
+	public void setIstErledigt(boolean istErledigt) {
+		this.istErledigt = istErledigt;
 	}
 }

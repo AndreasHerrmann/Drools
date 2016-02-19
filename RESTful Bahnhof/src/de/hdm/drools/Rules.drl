@@ -1,0 +1,157 @@
+//created on: 18.02.2016
+package de.hdm.drools
+
+//list any import classes here.
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response;
+import de.hdm.drools.resource.*;
+import de.hdm.drools.nachricht.*;
+
+declare Abfahrt
+	@role(event)
+end
+declare Einfahrt
+	@role(event)
+end
+declare EinfahrtAnfrageMitAsyncResponse
+	@role(event)
+end
+declare EinfahrtMitAsyncResponse
+	@role(event)
+end
+declare EinfahrtErlaubnis
+	@role(event)
+end
+
+rule "Erste EinfahrtAnfrage ohne Gleisangabe beantworten"
+	activation-group "EinfahrtAnfrage ohne Gleisangabe"
+    when
+        $einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis==null) and
+        $gleis:Gleis() and
+        not EinfahrtAnfrageMitAsyncResponse(istErledigt==true && gleis.nummer==$gleis.nummer)
+        not EinfahrtErlaubnis(gleis.nummer==$gleis.nummer) and
+        not EinfahrtMitAsyncResponse(gleis.nummer==$gleis.nummer)
+    then
+        $einfahrtAnfrage.setIstErledigt(true);
+        update($einfahrtAnfrage);
+        EinfahrtErlaubnis einfahrtErlaubnis = new EinfahrtErlaubnis($einfahrtAnfrage.getZug(),$gleis);
+        insert(einfahrtErlaubnis);
+        $einfahrtAnfrage.getAsyncResponse().resume(Response.ok(einfahrtErlaubnis).build());
+end
+
+rule "EinfahrtAnfrage ohne Gleisangabe positiv beantworten"
+	activation-group "EinfahrtAnfrage ohne Gleisangabe"
+    when
+        $einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis==null) and
+        $gleis:Gleis() and
+        $einfahrtErlaubnis:EinfahrtErlaubnis(gleis.nummer==$gleis.nummer) and
+        $abfahrt:Abfahrt(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && zug.iD==$einfahrtErlaubnis.zug.iD && this after $einfahrtErlaubnis) and
+        not EinfahrtErlaubnis(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && this after $einfahrtErlaubnis) and
+        not EinfahrtMitAsyncResponse(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && this after $abfahrt) 
+    then
+        $einfahrtAnfrage.setIstErledigt(true);
+        update($einfahrtAnfrage);
+        EinfahrtErlaubnis einfahrtErlaubnis = new EinfahrtErlaubnis($einfahrtAnfrage.getZug(),$gleis);
+        insert(einfahrtErlaubnis);
+        $einfahrtAnfrage.getAsyncResponse().resume(Response.ok(einfahrtErlaubnis).build());
+end
+
+rule "EinfahrtAnfrage ohne Gleisangabe negativ beantworten"
+	activation-group "EinfahrtAnfrage ohne Gleisangabe"
+	when
+		$einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis==null) and
+		(( not Gleis()) or not ($gleis:Gleis() and $einfahrt:EinfahrtMitAsyncResponse(gleis.nummer==$gleis.nummer)
+		and Abfahrt(gleis.nummer==$gleis.nummer && zug.iD==$einfahrt.zug.iD && this after $einfahrt)
+		and not EinfahrtMitAsyncResponse(gleis.nummer==$gleis.nummer && this after $einfahrt) 
+		and not EinfahrtErlaubnis(gleis.nummer==$gleis.nummer && this after $einfahrt)))
+	then
+		$einfahrtAnfrage.setIstErledigt(true);
+        update($einfahrtAnfrage);
+        $einfahrtAnfrage.getAsyncResponse().cancel();
+end
+
+rule "Erste EinfahrtAnfrage mit Gleisangabe beantworten"
+	activation-group "EinfahrtAnfrage mit Gleisangabe"
+	when
+		$einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis!=null) and
+        exists Gleis(nummer==$einfahrtAnfrage.gleis.nummer) and
+        not EinfahrtAnfrageMitAsyncResponse(istErledigt==true && gleis.nummer==$einfahrtAnfrage.gleis.nummer)
+        not EinfahrtErlaubnis(gleis.nummer==$einfahrtAnfrage.gleis.nummer) and
+        not EinfahrtMitAsyncResponse(gleis.nummer==$einfahrtAnfrage.gleis.nummer)
+	then
+		$einfahrtAnfrage.setIstErledigt(true);
+		update($einfahrtAnfrage);
+		EinfahrtErlaubnis einfahrtErlaubnis = new EinfahrtErlaubnis($einfahrtAnfrage.getZug(),$einfahrtAnfrage.getGleis());
+		insert(einfahrtErlaubnis);
+		$einfahrtAnfrage.getAsyncResponse().resume(Response.ok(einfahrtErlaubnis).build());
+end
+
+rule "EinfahrtAnfrage mit Gleisangabe positiv beantworten"
+	activation-group "EinfahrtAnfrage mit Gleisangabe"
+	when
+		$einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis!=null) and
+        exists Gleis(nummer==$einfahrtAnfrage.gleis.nummer) and
+        $einfahrtErlaubnis:EinfahrtErlaubnis(gleis.nummer==$einfahrtAnfrage.gleis.nummer) and
+        $abfahrt:Abfahrt(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && zug.iD==$einfahrtErlaubnis.zug.iD && this after $einfahrtErlaubnis) and
+        not EinfahrtErlaubnis(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && this after $einfahrtErlaubnis) and
+        not EinfahrtMitAsyncResponse(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && this after $abfahrt)
+	then
+		$einfahrtAnfrage.setIstErledigt(true);
+		update($einfahrtAnfrage);
+		EinfahrtErlaubnis einfahrtErlaubnis = new EinfahrtErlaubnis($einfahrtAnfrage.getZug(),$einfahrtAnfrage.getGleis());
+		insert(einfahrtErlaubnis);
+		$einfahrtAnfrage.getAsyncResponse().resume(Response.ok(einfahrtErlaubnis).build());
+end
+
+rule "EinfahrtAnfrage mit Gleisangabe negativ beantworten"
+	activation-group "EinfahrtAnfrage mit Gleisangabe"
+	when
+		$einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis!=null) and
+        (( not Gleis(nummer==$einfahrtAnfrage.gleis.nummer)) or
+        ( $einfahrtErlaubnis:EinfahrtErlaubnis(gleis.nummer==$einfahrtAnfrage.gleis.nummer && this before $einfahrtAnfrage) and
+        	not Abfahrt(gleis.nummer==$einfahrtErlaubnis.gleis.nummer && zug.iD==$einfahrtErlaubnis.zug.iD && this after $einfahrtErlaubnis)) or
+        ($einfahrt:EinfahrtMitAsyncResponse(gleis.nummer==$einfahrtAnfrage.gleis.nummer) and
+        not Abfahrt(gleis.nummer==$einfahrt.gleis.nummer && zug.iD==$einfahrt.zug.iD && this after $einfahrt)))
+	then
+	$einfahrtAnfrage.setIstErledigt(true);
+	update($einfahrtAnfrage);
+	$einfahrtAnfrage.getAsyncResponse().cancel();
+end
+
+rule "Erste Einfahrt auf Gleis beantworten"
+	activation-group "Einfahrt"
+	when
+		$einfahrt:EinfahrtMitAsyncResponse(istErledigt==false) and
+		exists Gleis(nummer==$einfahrt.gleis.nummer) and
+		exists EinfahrtErlaubnis(gleis.nummer==$einfahrt.gleis.nummer && zug.iD==$einfahrt.zug.iD) and
+		not EinfahrtMitAsyncResponse(gleis.nummer==$einfahrt.gleis.nummer && istErledigt==true) and
+		not EinfahrtErlaubnis(gleis.nummer==$einfahrt.gleis.nummer && zug.iD!=$einfahrt.zug.iD)
+	then
+	$einfahrt.setIstErledigt(true);
+	update($einfahrt);
+	$einfahrt.getAsyncResponse().resume(Response.ok().build());
+end
+
+rule "Einfahrt auf Gleis positiv beantworten"
+	activation-group "Einfahrt"
+	when
+		$einfahrt:EinfahrtMitAsyncResponse(istErledigt==false) and
+		exists Gleis(nummer==$einfahrt.gleis.nummer) and
+		$einfahrtErlaubnis:EinfahrtErlaubnis(gleis.nummer==$einfahrt.gleis.nummer && zug.iD==$einfahrt.zug.iD) over window:time(2m) and
+		not EinfahrtErlaubnis(gleis.nummer==$einfahrt.gleis.nummer && this after $einfahrtErlaubnis) and
+		not EinfahrtMitAsyncResponse(gleis.nummer==$einfahrt.gleis.nummer && istErledigt==true && this after $einfahrtErlaubnis)
+	then
+		$einfahrt.setIstErledigt(true);
+		update($einfahrt);
+		$einfahrt.getAsyncResponse().resume(Response.ok().build());
+end
+
+rule "Einfahrt auf Gleis negativ beantworten"
+	activation-group "Einfahrt"
+	when
+		$einfahrt:EinfahrtMitAsyncResponse(istErledigt==false) and
+		( not Gleis(nummer==$einfahrt.gleis.nummer) or
+		not EinfahrtErlaubnis(gleis.nummer==$einfahrt.gleis.nummer && zug.iD==$einfahrt.zug.iD) over window:time(3m))
+	then
+		$einfahrt.getAsyncResponse().cancel();
+end

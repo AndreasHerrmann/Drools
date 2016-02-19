@@ -13,7 +13,8 @@ import org.kie.api.runtime.KieSession;
 
 import de.hdm.drools.nachricht.Abfahrt;
 import de.hdm.drools.nachricht.EinfahrtMitAsyncResponse;
-import de.hdm.drools.nachricht.FahrtAnfrageMitAsyncResponse;
+import de.hdm.drools.resource.Gleis;
+import de.hdm.drools.nachricht.EinfahrtAnfrageMitAsyncResponse;
 
 /**
  * Der Thread, in dem die KnowledgeBase läuft. Generalisiert java.lang.Thread.
@@ -56,7 +57,7 @@ public class KnowledgeBaseThread extends Thread {
 			System.out.println("KieSession Resourcen freigegeben");
 		}
 	}
-	public static void fahrtAnfragen(FahrtAnfrageMitAsyncResponse fahrtanfrageMitAsync){
+	public static void fahrtAnfragen(EinfahrtAnfrageMitAsyncResponse fahrtanfrageMitAsync){
 		kSession.insert(fahrtanfrageMitAsync);
 	}
 	public static void einfahrtMelden(EinfahrtMitAsyncResponse einfahrtMitAsync){
@@ -64,5 +65,10 @@ public class KnowledgeBaseThread extends Thread {
 	}
 	public static void abfahrtMelden(Abfahrt abfahrt){
 		kSession.insert(abfahrt);
+	}
+	public static void gleiseEinfuegen(Gleis[] gleise){
+		for(int i=0;i<gleise.length;i++){
+			kSession.insert(gleise[i]);
+		}
 	}
 }		

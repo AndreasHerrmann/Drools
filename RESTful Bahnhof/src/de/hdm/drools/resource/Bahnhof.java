@@ -3,13 +3,9 @@ package de.hdm.drools.resource;
 public class Bahnhof extends Knotenpunkt {
 	private String name;
 	private Knotenpunkt[] knotenpunkte;
+	private int gleisAnzahl;
 	public Bahnhof(){
 		
-	}
-	public Bahnhof(long iD, String name,Knotenpunkt[] knotenpunkte){
-		this.iD=iD;
-		this.name=name;
-		this.knotenpunkte=knotenpunkte;
 	}
 	public String getName() {
 		return name;
@@ -24,6 +20,9 @@ public class Bahnhof extends Knotenpunkt {
 		else{
 			return null;
 		}
+	}
+	public int getGleisAnzahl(){
+		return gleisAnzahl;
 	}
 	public boolean equals(Bahnhof bahnhof){
 		if(this.iD==bahnhof.getiD()){

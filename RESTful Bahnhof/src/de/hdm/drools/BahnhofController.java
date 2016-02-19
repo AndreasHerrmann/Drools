@@ -25,8 +25,8 @@ import org.eclipse.jetty.http.HttpStatus;
 import de.hdm.drools.nachricht.Abfahrt;
 import de.hdm.drools.nachricht.Einfahrt;
 import de.hdm.drools.nachricht.EinfahrtMitAsyncResponse;
-import de.hdm.drools.nachricht.FahrtAnfrage;
-import de.hdm.drools.nachricht.FahrtAnfrageMitAsyncResponse;
+import de.hdm.drools.nachricht.EinfahrtAnfrage;
+import de.hdm.drools.nachricht.EinfahrtAnfrageMitAsyncResponse;
 import de.hdm.drools.resource.Bahnhof;
 import de.hdm.drools.resource.Gleis;
 import de.hdm.drools.resource.Knotenpunkt;
@@ -62,6 +62,11 @@ public class BahnhofController {
 					wegfuehrendeStrecken=neuerArray;
 				}
 			}
+			//Gleise erstellen. Erstes Gleis hat die Nummer 1
+			gleise = new Gleis[bahnhof.getGleisAnzahl()];
+			for (int i=0;i<bahnhof.getGleisAnzahl();i++){
+				gleise[i]=new Gleis(i+1);
+			}
 			return true;
 		}
 		else{
@@ -82,6 +87,7 @@ public class BahnhofController {
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
+			abmelden();
 			boolean antwort = anmelden();
 			if(antwort){
 				return Response.ok().build();
@@ -98,7 +104,7 @@ public class BahnhofController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public void einfahrtAnfragen(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
-			@NotNull FahrtAnfrage fahrtanfrage){
+			@NotNull EinfahrtAnfrage fahrtanfrage){
 		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
 		if(!adresse.equals(fahrtanfrage.getZug().getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
@@ -107,7 +113,7 @@ public class BahnhofController {
 			for(int i=0;i<gleise.length;i++){
 				if(fahrtanfrage.getGleis().equals(gleise[i])){
 					KnowledgeBaseThread
-					.fahrtAnfragen(new FahrtAnfrageMitAsyncResponse(fahrtanfrage
+					.fahrtAnfragen(new EinfahrtAnfrageMitAsyncResponse(fahrtanfrage
 							,asyncResponse));
 				}
 			}
@@ -153,7 +159,7 @@ public class BahnhofController {
 		}
 	}
 	
-	@Path("/strecken")
+	@Path("/strecke")
 	@GET
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

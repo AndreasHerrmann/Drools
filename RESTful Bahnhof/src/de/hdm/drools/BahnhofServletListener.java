@@ -15,6 +15,7 @@ public class BahnhofServletListener implements ServletContextListener{
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
+		BahnhofController.abmelden();
 		kieSessionThread.interrupt();
 		kieSessionThread=null;
 
@@ -30,5 +31,6 @@ public class BahnhofServletListener implements ServletContextListener{
 		kieSessionThread = new KnowledgeBaseThread();
 		kieSessionThread.start();
 		System.out.println("KieSession gestartet");
+		BahnhofController.anmelden();
 	}
 }
