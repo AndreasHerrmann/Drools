@@ -5,13 +5,15 @@ import java.net.URI;
 public class Bahnhof extends Knotenpunkt {
 	private String name;
 	private Knotenpunkt[] knotenpunkte;
+	private int gleisAnzahl;
 	public Bahnhof(){
 		
 	}
-	public Bahnhof(long iD, String name,Knotenpunkt[] knotenpunkte){
+	public Bahnhof(long iD, String name,Knotenpunkt[] knotenpunkte, int gleisAnzahl){
 		this.iD=iD;
 		this.name=name;
 		this.knotenpunkte=knotenpunkte;
+		this.gleisAnzahl=gleisAnzahl;
 	}
 	public String getName() {
 		return name;
@@ -26,6 +28,9 @@ public class Bahnhof extends Knotenpunkt {
 		else{
 			return knotenpunkte[index];
 		}
+	}
+	public int getGleisAnzahl(){
+		return gleisAnzahl;
 	}
 	public boolean equals(Bahnhof bahnhof){
 		if(this.iD==bahnhof.getID()){

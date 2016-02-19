@@ -76,6 +76,7 @@ rule "Zug anmelden"
 end
 
 rule "Erste Fahrtanfrage beantworten"
+	activation-group "FahrtAnfrage"
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
 		$strecke:Strecke(iD==$fahrtAnfrage.strecke.iD) and
@@ -90,6 +91,7 @@ rule "Erste Fahrtanfrage beantworten"
 end
 
 rule "Fahrtanfrage positiv beantworten"
+	activation-group "FahrtAnfrage"
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
 		$strecke:Strecke(iD==$fahrtAnfrage.strecke.iD) and
@@ -106,6 +108,7 @@ rule "Fahrtanfrage positiv beantworten"
 end
 
 rule "Fahrtanfrage negativ beantworten"
+	activation-group "FahrtAnfrage"
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
 		( ($fahrtErlaubnis:FahrtErlaubnis(strecke.iD==$fahrtAnfrage.strecke.iD) over window:time(2m) and
@@ -120,6 +123,7 @@ rule "Fahrtanfrage negativ beantworten"
 end
 
 rule "Ersten Fahrtbeginn beantworten"
+	activation-group "FahrtBeginn"
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD && this before $fahrtBeginn) and
@@ -132,6 +136,7 @@ rule "Ersten Fahrtbeginn beantworten"
 end
 
 rule "Fahrtbeginn positiv beantworten"
+	activation-group "FahrtBeginn"
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
 		exists FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD) over window:time(2m) and
@@ -146,6 +151,7 @@ rule "Fahrtbeginn positiv beantworten"
 end
 
 rule "Fahrtbeginn negativ beantworten"
+	activation-group "FahrtBeginn"
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
 		( (not FahrtErlaubnis(strecke.iD==$fahrtBeginn.strecke.iD && zug.iD==$fahrtBeginn.zug.iD && this before $fahrtBeginn) over window:time(2m)) or

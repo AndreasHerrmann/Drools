@@ -34,19 +34,19 @@ public class ContextBuilder {
 		
 		//5 Bahnhöfe erstellen
 		Knotenpunkt kStuttgart[] = {knotenpunkt2,knotenpunkt3};
-		Bahnhof stuttgart = new Bahnhof(1, "Stuttgart", kStuttgart);
+		Bahnhof stuttgart = new Bahnhof(1, "Stuttgart", kStuttgart,4);
 		
 		Knotenpunkt kFlughafen[] = {knotenpunkt10,knotenpunkt11};
-		Bahnhof flughafen = new Bahnhof(2,"Flughafen",kFlughafen);
+		Bahnhof flughafen = new Bahnhof(2,"Flughafen",kFlughafen,2);
 		
 		Knotenpunkt kBoeblingen[] = {knotenpunkt12,knotenpunkt13};
-		Bahnhof boeblingen = new Bahnhof(3,"Böblingen",kBoeblingen);
+		Bahnhof boeblingen = new Bahnhof(3,"Böblingen",kBoeblingen,2);
 		
 		Knotenpunkt kLeonberg[] = {knotenpunkt8,knotenpunkt9};
-		Bahnhof leonberg = new Bahnhof(4,"Leonberg",kLeonberg);
+		Bahnhof leonberg = new Bahnhof(4,"Leonberg",kLeonberg,2);
 		
 		Knotenpunkt kPlochingen[] = {knotenpunkt6,knotenpunkt7};
-		Bahnhof plochingen = new Bahnhof(5,"Plochingen",kPlochingen);
+		Bahnhof plochingen = new Bahnhof(5,"Plochingen",kPlochingen,2);
 		
 		//Knotenpunkte mit Strecken verbinden
 		Strecke strecke1 = new Strecke(1,knotenpunkt1,knotenpunkt2);
