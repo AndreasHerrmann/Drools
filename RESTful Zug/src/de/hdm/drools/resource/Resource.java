@@ -1,10 +1,10 @@
 package de.hdm.drools.resource;
 
 public abstract class Resource {
-	protected long iD;
+	protected long id;
 	
-	public long getiD() {
-		return iD;
+	public long getId() {
+		return id;
 	}
 	
 }

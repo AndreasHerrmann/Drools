@@ -1,6 +1,8 @@
 package de.hdm.drools;
 
+import java.net.URI;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -19,7 +21,6 @@ import de.hdm.drools.nachricht.FahrtAnfrage;
 import de.hdm.drools.nachricht.FahrtBeginn;
 import de.hdm.drools.nachricht.FahrtErlaubnis;
 import de.hdm.drools.nachricht.Lebenszeichen;
-import de.hdm.drools.nachricht.EinfahrtAnfrage;
 import de.hdm.drools.resource.Fahrplan;
 import de.hdm.drools.resource.Gleis;
 import de.hdm.drools.resource.Knotenpunkt;
@@ -40,10 +41,11 @@ public class ZugThread extends Thread {
 		for(counter=0;(counter<3)&&(dieserZug==null);counter++){
 			anmelden();
 		}
-		//Wenn nach drei Versuchen dieserZug immer noch null ist, dann konnte der Zug nicht angemeldet werden
+		//Wenn nach drei Versuchen dieser Zug immer noch null ist, dann konnte der Zug nicht angemeldet werden
 		if((dieserZug==null)&&counter>=3){
 			System.out.println("Anmeldung nicht möglich! Adresse der Netzverwaltung falsch?");
 		}
+		fahrplan=dieserZug.getFahrplan();
 		Client client = ClientBuilder.newClient();
 		netzverwaltung = client.target(Config.netzverwaltungAdresse);
 		while(!isInterrupted()){
@@ -62,6 +64,7 @@ public class ZugThread extends Thread {
 							}
 							else{
 								//Wenn er nicht der selbe Bahnhof ist, dann muss ich erst zu ihm hin fahren
+								System.out.println("Bahnhof zu Bahnhof: "+fahrplan.getFahrtziel(i));
 								vonBahnhofZuKnotenpunktFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
 							}
 						}
@@ -69,6 +72,7 @@ public class ZugThread extends Thread {
 							/*Wenn der letzte Knotenpunkt ein Bahnhof ist und der aktuelle
 							 * nicht, dann muss ich zu einem Knotenpunkt fahren
 							 */
+							System.out.println("Von Bahnhof zu Knotenpunkt: "+fahrplan.getFahrtziel(i));
 							vonBahnhofZuKnotenpunktFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
 						}
 					}
@@ -77,6 +81,7 @@ public class ZugThread extends Thread {
 						 * kein Bahnhof ist, dann muss ich von diesem Knotenpunkt
 						 * zum nächsten fahren
 						 */
+						System.out.println("Knotenpunkt zu Knotenpunkt :"+fahrplan.getFahrtziel(i));
 						vonKnotenpunktZuKnotenpunktFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
 					}
 				}
@@ -84,12 +89,14 @@ public class ZugThread extends Thread {
 					//Wenn der letzte Ort kein Knotenpunkt ist, dann ist er eine Strecke
 					if(fahrplan.getFahrtziel(i).getIstBahnhof()){
 						//Wenn der aktuelle Knotenpunkt ein Bahnhof ist, dann muss ich in ihn einfahren
+						System.out.println("Strecke in Bahnhof :"+fahrplan.getFahrtziel(i));
 						vonStreckeInBahnhofFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
 					}
 					else{
 						/*Wenn der aktuelle Knotenpunkt kein Bahnhof ist,
 						 *dann muss ich auf einen Knotenpunkt auffahren
 						 */
+						System.out.println("Von Strecke auf Knotenpunkt :"+fahrplan.getFahrtziel(i));
 						vonStreckeAufKnotenpunktFahren(fahrplan.getFahrtziel(i),client);
 					}
 				}
@@ -102,15 +109,19 @@ public class ZugThread extends Thread {
 	 * Methode um von einem Kotenpunkt zum nächsten zu fahren
 	 */
 	private void vonKnotenpunktZuKnotenpunktFahren(Knotenpunkt knotenpunkt,int fahrtzeit,Client client){
-		WebTarget streckenTarget = client.target(letzterKnotenpunkt.getAdresse()).path("/strecke");
+		if(letzterKnotenpunkt.getAdresse()==null){
+			letzterKnotenpunkt.setAdresse(knotenpunktAdresseFinden(letzterKnotenpunkt));
+		}
+		WebTarget streckenTarget = client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/strecke");
 		Response resp = streckenTarget.request(MediaType.APPLICATION_JSON)
 				.post(Entity.json(knotenpunkt));
-		if(!resp.hasEntity()){
+		if(resp.getStatus()!=HttpStatus.OK_200){
 			resp = knotenpunktOffline(knotenpunkt,client);
 		}
-		Strecke strecken[] = resp.readEntity(Strecke[].class);
+		Strecke[] strecken = resp.readEntity(Strecke[].class);
 		if(strecken.length<=0){
-			//Fehler
+			System.out.println("Fehler: Zeile 124");
+			System.out.println(resp);
 		}
 		WebTarget anfrageTarget = netzverwaltung.path("/fahrt/anfrage");
 		
@@ -121,10 +132,10 @@ public class ZugThread extends Thread {
 						.post(Entity.json(new FahrtAnfrage(dieserZug,strecken[i])));
 				antworten.addElement(resp);
 			}
-		}while((!eineAntwortWahr(antworten))&&warten(10));
+		}while((!eineAntwortWahr(antworten))&&warten(5));
 		Response trueResponse = wahreAntwortFinden(antworten);
 		if(trueResponse==null){
-			//Fehler
+			System.out.println("Fehler: Zeile 138");
 		}
 		FahrtErlaubnis fahrtErlaubnis = trueResponse.readEntity(FahrtErlaubnis.class);
 		WebTarget fahrtBeginnTarget = netzverwaltung.path("/fahrt/beginn");
@@ -133,12 +144,13 @@ public class ZugThread extends Thread {
 			resp = fahrtBeginnTarget.request(MediaType.APPLICATION_JSON)
 			.post(Entity.json(new FahrtBeginn(dieserZug,fahrtErlaubnis.getStrecke())));
 			counter++;
-		}while((resp.getStatus()!=HttpStatus.OK_200)&&(counter<=3)&&(warten(10)));
-		if(!resp.hasEntity()){
-			//Fehler
+		}while((resp.getStatus()!=HttpStatus.OK_200)&&(counter<=3)&&(warten(5)));
+		if(resp.getStatus()!=HttpStatus.OK_200){
+			System.out.println("Fehler: Zeile 149");
+			System.out.println(resp);
 		}
 		//Abfahrt vom letzten Knotenpunkt melden
-		client.target(letzterKnotenpunkt.getAdresse()).path("/abfahrtMelden/")
+		client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/abfahrtMelden")
 		.request(MediaType.APPLICATION_JSON).post(Entity.json(dieserZug));
 		WebTarget lebenszeichenTarget = netzverwaltung.path("/fahrt/lebenszeichen");
 		for(int i=0; i<fahrtzeit;i++){
@@ -148,7 +160,8 @@ public class ZugThread extends Thread {
 			resp = lebenszeichenTarget.request()
 					.post(Entity.json(new Lebenszeichen(dieserZug,fahrtErlaubnis.getStrecke())));
 			if(resp.getStatus()!=HttpStatus.OK_200){
-				//Fehler
+				System.out.println("Fehler: Zeile 162");
+				System.out.println(resp);
 			}
 		}
 		//Fahrt abschließen
@@ -159,16 +172,20 @@ public class ZugThread extends Thread {
 	 * Methode um von einem Bahnhof zu einem Knotenpunkt zu fahren
 	 */
 	private void vonBahnhofZuKnotenpunktFahren(Knotenpunkt knotenpunkt, int fahrtzeit, Client client){
-		WebTarget streckenTarget = client.target(letzterKnotenpunkt.getAdresse()).path("/strecke");
+		if(letzterKnotenpunkt.getAdresse()==null){
+			letzterKnotenpunkt.setAdresse(knotenpunktAdresseFinden(letzterKnotenpunkt));
+		}
+		WebTarget streckenTarget = client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/strecke");
 		Response resp = streckenTarget.request(MediaType.APPLICATION_JSON)
 				.post(Entity.json(knotenpunkt));
-		if(!resp.hasEntity()){
+		if(resp.getStatus()!=HttpStatus.OK_200){
 			//Dann ist der Knotenpunkt nicht zu erreichen (Adresse nicht mehr aktuell?)
 			resp = knotenpunktOffline(knotenpunkt,client);
 		}
 		Strecke strecken[] = resp.readEntity(Strecke[].class);
 		if(strecken.length<=0){
-			//Fehler
+			System.out.println("Fehler: Zeile 185");
+			System.out.println(resp);
 		}
 		WebTarget anfrageTarget = netzverwaltung.path("/fahrt/anfrage");
 		
@@ -179,10 +196,11 @@ public class ZugThread extends Thread {
 						.post(Entity.json(new FahrtAnfrage(dieserZug,strecken[i])));
 				antworten.addElement(resp);
 			}
-		}while((!eineAntwortWahr(antworten))&&warten(10));
+		}while((!eineAntwortWahr(antworten))&&warten(5));
 		Response trueResponse = wahreAntwortFinden(antworten);
 		if(trueResponse==null){
-			//Fehler
+			System.out.println("Fehler: Zeile 199");
+			System.out.println(resp);
 		}
 		FahrtErlaubnis fahrtErlaubnis = trueResponse.readEntity(FahrtErlaubnis.class);
 		WebTarget fahrtBeginnTarget = netzverwaltung.path("/fahrt/beginn");
@@ -191,12 +209,13 @@ public class ZugThread extends Thread {
 			resp = fahrtBeginnTarget.request(MediaType.APPLICATION_JSON)
 			.post(Entity.json(new FahrtBeginn(dieserZug,fahrtErlaubnis.getStrecke())));
 			counter++;
-		}while((resp.getStatus()!=HttpStatus.OK_200)&&(counter<=3)&&(warten(10)));
-		if(!resp.hasEntity()){
-			//Fehler
+		}while((resp.getStatus()!=HttpStatus.OK_200)&&(counter<=3)&&(warten(5)));
+		if(resp.getStatus()!=HttpStatus.OK_200){
+			System.out.println("Fehler: Zeile 210");
+			System.out.println(resp);
 		}
 		//Abfahrt vom Bahnhof melden
-		client.target(letzterKnotenpunkt.getAdresse()).path("/abfahrtMelden/")
+		client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/abfahrtMelden")
 		.request(MediaType.APPLICATION_JSON).post(Entity
 				.json(new Abfahrt(dieserZug,letztesGleis)));
 		WebTarget lebenszeichenTarget = netzverwaltung.path("/fahrt/lebenszeichen");
@@ -207,7 +226,8 @@ public class ZugThread extends Thread {
 			resp = lebenszeichenTarget.request()
 					.post(Entity.json(new Lebenszeichen(dieserZug,fahrtErlaubnis.getStrecke())));
 			if(resp.getStatus()!=HttpStatus.OK_200){
-				//Fehler
+				System.out.println("Fehler: Zeile 224");
+				System.out.println(resp);
 			}
 		}
 		//Fahrt abschließen
@@ -219,23 +239,39 @@ public class ZugThread extends Thread {
 	 * Methode um von einer Strecke auf einen Knotenpunkt aufzufahren
 	 */
 	private void vonStreckeAufKnotenpunktFahren(Knotenpunkt knotenpunkt, Client client){
-		WebTarget auffahrtTarget = client.target(knotenpunkt.getAdresse()).path("/auffahrtAnfragen/");
-		Response resp=null;
-		do{
-			resp = auffahrtTarget.request(MediaType.APPLICATION_JSON)
-					.post(Entity.json(dieserZug));
-		}while((resp.getStatus()!=HttpStatus.OK_200)&&warten(10));
-		if(resp.getStatus()!=HttpStatus.OK_200){
-			//Fehler
+		if(knotenpunkt.getAdresse()==null){
+			knotenpunkt.setAdresse(knotenpunktAdresseFinden(knotenpunkt));
 		}
-		auffahrtTarget = client.target(knotenpunkt.getAdresse()).path("/auffahrtMelden/");
+		WebTarget auffahrtTarget = client.target("http://"+knotenpunkt.getAdresse()+":8080").path("/auffahrtAnfragen");
+		Response resp=null;
+		int counter = 0;
 		do{
 			resp = auffahrtTarget.request(MediaType.APPLICATION_JSON)
 					.post(Entity.json(dieserZug));
-		}while((resp.getStatus()!=HttpStatus.OK_200)&&warten(10));
-		//Abfahrt von letzter Strecke melden
-		netzverwaltung.path("/fahrt/abschluss").request(MediaType.APPLICATION_JSON)
-		.post(Entity.json(new FahrtAbschluss(dieserZug,letzteStrecke)));
+			counter++;
+		}while((resp.getStatus()!=HttpStatus.OK_200) && warten(5) && counter<=3);
+		if(resp.getStatus()!=HttpStatus.OK_200){
+			System.out.println("Fehler: Zeile 248");
+			System.out.println(resp);
+		}
+		auffahrtTarget = client.target("http://"+knotenpunkt.getAdresse()+":8080").path("/auffahrtMelden");
+		counter=0;
+		do{
+			resp = auffahrtTarget.request(MediaType.APPLICATION_JSON)
+					.post(Entity.json(dieserZug));
+			counter++;
+		}while((resp.getStatus()!=HttpStatus.OK_200) && warten(5) && counter<=3);
+		if(resp.getStatus()!=HttpStatus.OK_200){
+			System.out.println("Fehler: Zeile 258");
+			System.out.println(resp);
+		}
+		//Abfahrt von letzter Strecke melden, wenn sie nicht null ist
+		//Wenn die letzte Strecke null, dann beginnt der Zug gerade erst
+		if(letzteStrecke!=null){
+			netzverwaltung.path("/fahrt/abschluss").request(MediaType.APPLICATION_JSON)
+			.post(Entity.json(new FahrtAbschluss(dieserZug,letzteStrecke)));
+		}
+		//Fahrt abschließen
 		letzteStrecke = null;
 		letzterKnotenpunkt=knotenpunkt;
 		letztesGleis=null;
@@ -245,49 +281,61 @@ public class ZugThread extends Thread {
 	 * Methode um von einer Strecke in einen Bahnhof einzufahren
 	 */
 	private void vonStreckeInBahnhofFahren(Knotenpunkt knotenpunkt,int aufenthalt,Client client){
-		WebTarget einfahrtTarget = client.target(knotenpunkt.getAdresse()).path("/einfahrtAnfragen");
+		if(knotenpunkt.getAdresse()==null){
+			knotenpunkt.setAdresse(knotenpunktAdresseFinden(knotenpunkt));
+		}
+		WebTarget einfahrtTarget = client.target("http://"+knotenpunkt.getAdresse()+":8080").path("/einfahrtAnfragenOhneGleis");
 		Response resp=null;
+		int counter=0;
 		do{
 			resp = einfahrtTarget.request(MediaType.APPLICATION_JSON)
-					.post(Entity.json(new EinfahrtAnfrage(dieserZug,null)));
-		}while((resp.getStatus()!=HttpStatus.OK_200)&&warten(10));
-		if(!resp.hasEntity()){
-			//Fehler
+					.post(Entity.json(dieserZug));
+			counter++;
+		}while((resp.getStatus()!=HttpStatus.OK_200)&&warten(5)&&counter<=3);
+		if(resp.getStatus()!=HttpStatus.OK_200){
+			System.out.println("Fehler: Zeile 297");
+			System.out.println(resp);
 		}
 		EinfahrtErlaubnis erlaubnis =  resp.readEntity(EinfahrtErlaubnis.class);
-		einfahrtTarget = client.target(knotenpunkt.getAdresse()).path("/einfahrtMelden");
+		einfahrtTarget = client.target("http://"+knotenpunkt.getAdresse()+":8080").path("/einfahrtMelden");
+		counter=0;
 		do{
 			resp = einfahrtTarget.request(MediaType.APPLICATION_JSON)
 					.post(Entity.json(new Einfahrt(dieserZug,erlaubnis.getGleis())));
-		}while((resp.getStatus()!=HttpStatus.OK_200)&&warten(10));
+			counter++;
+		}while((resp.getStatus()!=HttpStatus.OK_200)&&warten(5)&&counter<=3);
 		if(resp.getStatus()!=HttpStatus.OK_200){
-			//Fehler
+			System.out.println("Fehler: Zeile 299");
+			System.out.println(resp);
 		}
-		//Abfahrt von letzter Strecke melden
-		netzverwaltung.path("/fahrt/abschluss").request(MediaType.APPLICATION_JSON)
-		.post(Entity.json(new FahrtAbschluss(dieserZug,letzteStrecke)));
+		//Abfahrt von letzter Strecke melden, wenn sie nicht null ist
+		//Wenn die letzte Strecke null, dann beginnt der Zug gerade erst
+		if(letzteStrecke!=null){
+			netzverwaltung.path("/fahrt/abschluss").request(MediaType.APPLICATION_JSON)
+			.post(Entity.json(new FahrtAbschluss(dieserZug,letzteStrecke)));
+		}
 		//Fahrt Abschließen
 		letzteStrecke = null;
 		letzterKnotenpunkt=knotenpunkt;
 		letztesGleis=erlaubnis.getGleis();
 		//An Gleis warten
-		if(!warten(aufenthalt)){
-			//Fehler
+		if(!warten(aufenthalt*60)){
+			System.out.println("Fehler: Zeile 313");
 		}
 		
 		
 	}
 	/*
-	 * Methode um 'length' Minuten zu warten
+	 * Methode um 'length' Sekunden zu warten
 	 */
 	private boolean warten(int length){
 		try {
-			wait(length*60000);
+			TimeUnit.SECONDS.sleep(length);
+			return true;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			return false;
 		}
-		return true;
 	}
 	/*
 	 * Methode um herauszufinden, ob eine der Antworten wahr ist
@@ -315,14 +363,14 @@ public class ZugThread extends Thread {
 		return null;
 	}
 	private Response knotenpunktOffline(Knotenpunkt knotenpunkt,Client client){
-		Response resp = netzverwaltung.path("/knotenpunkt/"+letzterKnotenpunkt.getiD()).request().get();
+		Response resp = netzverwaltung.path("/knotenpunkt/"+letzterKnotenpunkt.getId()).request().get();
 		if(resp.getStatus()==HttpStatus.OK_200){
 			letzterKnotenpunkt = resp.readEntity(Knotenpunkt.class);
 			//Erneut versuchen
-			WebTarget streckenTarget = client.target(letzterKnotenpunkt.getAdresse()).path("/strecke");
+			WebTarget streckenTarget = client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/strecke");
 			resp = streckenTarget.request(MediaType.APPLICATION_JSON).post(Entity.json(knotenpunkt));
 			//Wenn er zu erreichen ist
-			if(resp.hasEntity()){
+			if(resp.getStatus()==HttpStatus.OK_200){
 				return resp;
 			}
 			//Wenn nicht
@@ -340,18 +388,29 @@ public class ZugThread extends Thread {
 					return Response.ok(passendeStrecken.toArray(strecken)).build();
 				}
 				else{
-					//Fehler
+					System.out.println("Fehler: Zeile 381");
 					return null;
 				}
 			}
 		}
 		//Wenn die Netzverwaltung ihn nicht kennt
 		else{
-			//Fehler
+			System.out.println("Fehler: Zeile 388");
 			return null;
 		}
 		
 		
+	}
+	private URI knotenpunktAdresseFinden(Knotenpunkt knotenpunkt){
+		Response resp = netzverwaltung.path("/knotenpunkt/"+knotenpunkt.getId())
+				.request(MediaType.APPLICATION_JSON).get();
+		if(resp.getStatus()==HttpStatus.OK_200){
+			knotenpunkt = resp.readEntity(Knotenpunkt.class);
+			return knotenpunkt.getAdresse();
+		}
+		else{
+			return null;
+		}
 	}
 	private boolean anmelden(){
 		Client client = ClientBuilder.newClient();

@@ -16,7 +16,7 @@ public class Zug extends Resource {
 		return fahrplan;
 	}
 	public boolean equals(Zug zug){
-		if(this.iD==zug.getiD()){
+		if(this.id==zug.getId()){
 			return true;
 		}
 		else{

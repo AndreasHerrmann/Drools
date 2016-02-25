@@ -14,7 +14,7 @@ public class Strecke extends Resource {
 		return ziel;
 	}
 	public boolean equals(Strecke strecke){
-		if(this.iD==strecke.getiD()){
+		if(this.id==strecke.getId()){
 			return true;
 		}
 		else{
