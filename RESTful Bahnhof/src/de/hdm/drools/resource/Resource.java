@@ -1,5 +1,10 @@
 package de.hdm.drools.resource;
 
+/**
+ * Abstrakte Oberklasse aller Resourcen, die der Bahnhof kennt
+ * @author Andreas Herrmann
+ * @param id Die ID der jeweiligen Resource
+ */
 public abstract class Resource {
 	protected long id;
 	

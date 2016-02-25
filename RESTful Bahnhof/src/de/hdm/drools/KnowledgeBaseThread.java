@@ -17,15 +17,23 @@ import de.hdm.drools.resource.Gleis;
 import de.hdm.drools.nachricht.EinfahrtAnfrageMitAsyncResponse;
 
 /**
- * Der Thread, in dem die KnowledgeBase läuft. Generalisiert java.lang.Thread.
- * Wird beim Start des Servlets aufgerufen.
+ * Der Thread, in dem die KnowledgeBase läuft. Generalisiert {@link java.lang.Thread}.
  * @author Andreas Herrmann
- * @param kSession Die KieSession, die in dem Thread abläuft
+ * @param kSession Die {@link org.kie.api.runtime.KieSession}, die in dem Thread läuft
  *
  */
 public class KnowledgeBaseThread extends Thread {
+	/**
+	 * Die {@link org.kie.api.runtime.KieSession}, die in dem Thread läuft und
+	 * alle Entscheidungen des Bahnhofs trifft. 
+	 */
 	private static KieSession kSession=null;
-	//Startet die KieSession
+	/**
+	 * Wird beim Start des Threads aufgerufen. Erstellt die {@link org.kie.api.runtime.KieSession}
+	 * und lässt diese feuern bis der Thrad angehalten wird.
+	 * Wenn der Thread angehalten wird, dann beendet er die {@link org.kie.api.runtime.KieSession}
+	 * und gibt deren Resourcen frei.
+	 */
 	public void run(){
 		try {
 			KieServices kService = KieServices.Factory.get();
@@ -58,15 +66,35 @@ public class KnowledgeBaseThread extends Thread {
 			System.out.println("KieSession Resourcen freigegeben");
 		}
 	}
+	/**
+	 * Statische Methode zum Einfügen einer {@link de.hdm.drools.nachricht.EinfahrtAnfrageMitAsyncResponse}
+	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
+	 * @param fahrtanfrageMitAsync Die {@link de.hdm.drools.nachricht.EinfahrtAnfrageMitAsyncResponse}, die eingefügt werden soll
+	 */
 	public static void fahrtAnfragen(EinfahrtAnfrageMitAsyncResponse fahrtanfrageMitAsync){
 		kSession.insert(fahrtanfrageMitAsync);
 	}
+	/**
+	 * Statische Methode zum Einfügen einer {@link de.hdm.drools.nachricht.EinfahrtMitAsyncResponse}
+	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
+	 * @param einfahrtMitAsync Die {@link de.hdm.drools.nachricht.EinfahrtMitAsyncResponse}, die eingefügt werden soll
+	 */
 	public static void einfahrtMelden(EinfahrtMitAsyncResponse einfahrtMitAsync){
 		kSession.insert(einfahrtMitAsync);
 	}
+	/**
+	 * Statische Methode zum Einfügen einer {@link de.hdm.drools.nachricht.Abfahrt}
+	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
+	 * @param abfahrt Die {@link de.hdm.drools.nachricht.Abfahrt}, die eingefügt werden soll
+	 */
 	public static void abfahrtMelden(Abfahrt abfahrt){
 		kSession.insert(abfahrt);
 	}
+	/**
+	 * Statische Methode zum Einfügen eines {@link de.hdm.drools.resource.Gleis}
+	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
+	 * @param gleis Das {@link e.hdm.drools.resource.Gleis}, das eingefügt werden soll
+	 */
 	public static void gleisEinfuegen(Gleis gleis){
 			kSession.insert(gleis);
 	}
