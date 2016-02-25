@@ -8,7 +8,7 @@ public class Strecke extends Resource {
 		
 	}
 	public Strecke(long iD, Knotenpunkt von, Knotenpunkt nach){
-		this.iD=iD;
+		this.id=iD;
 		this.start=von;
 		this.ziel=nach;
 	}
@@ -19,7 +19,7 @@ public class Strecke extends Resource {
 		return ziel;
 	}
 	public boolean equals(Strecke strecke){
-		if(this.iD==strecke.getID()){
+		if(this.id==strecke.getId()){
 			return true;
 		}
 		else{

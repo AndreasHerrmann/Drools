@@ -24,11 +24,12 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 	 * @param sce Das ServletContextEvent, dass zum Aufrufen der Methode geführt hat
 	 */
 	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		kieSessionThread.interrupt();
-		kieSessionThread=null;
-
-	}
+	public void contextDestroyed(ServletContextEvent sce)
+		{
+			kieSessionThread.interrupt();
+			kieSessionThread=null;
+			NetzverwaltungsOutput.stop();
+		}
 
 	/**
 	 * Wird beim Start des Servlets automatisch aufgerufen. Startet ggf. den Logger,
@@ -38,6 +39,7 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+		NetzverwaltungsOutput.start();
 		kieSessionThread = new KnowledgeBaseThread();
 		kieSessionThread.start();
 		new ContextBuilder();

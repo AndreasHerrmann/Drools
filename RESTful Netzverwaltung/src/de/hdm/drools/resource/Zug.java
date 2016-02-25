@@ -10,7 +10,7 @@ public class Zug extends Resource {
 		
 	}
 	public Zug(long iD, Fahrplan fahrplan){
-		this.iD=iD;
+		this.id=iD;
 		this.fahrplan=fahrplan;
 	}
 	public URI getAdresse() {
@@ -23,7 +23,7 @@ public class Zug extends Resource {
 		return fahrplan;
 	}
 	public boolean equals(Zug zug){
-		if(this.iD==zug.getID()){
+		if(this.id==zug.getId()){
 			return true;
 		}
 		else{

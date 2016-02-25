@@ -10,10 +10,10 @@ public class Knotenpunkt extends Resource {
 		
 	}
 	public Knotenpunkt(long iD){
-		this.iD=iD;
+		this.id=iD;
 	}
 	public Knotenpunkt(long iD, boolean istBahnhof){
-		this.iD=iD;
+		this.id=iD;
 		this.istBahnhof=istBahnhof;
 	}
 	public URI getAdresse() {
@@ -27,7 +27,7 @@ public class Knotenpunkt extends Resource {
 	}
 	
 	public boolean equals(Knotenpunkt knotenpunkt){
-		if(this.iD==knotenpunkt.getID()){
+		if(this.id==knotenpunkt.getId()){
 			return true;
 		}
 		else{

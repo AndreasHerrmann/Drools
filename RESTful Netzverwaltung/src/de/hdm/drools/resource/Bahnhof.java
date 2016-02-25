@@ -10,7 +10,7 @@ public class Bahnhof extends Knotenpunkt {
 		
 	}
 	public Bahnhof(long iD, String name,Knotenpunkt[] knotenpunkte, int gleisAnzahl){
-		this.iD=iD;
+		this.id=iD;
 		this.name=name;
 		this.knotenpunkte=knotenpunkte;
 		this.gleisAnzahl=gleisAnzahl;
@@ -33,7 +33,7 @@ public class Bahnhof extends Knotenpunkt {
 		return gleisAnzahl;
 	}
 	public boolean equals(Bahnhof bahnhof){
-		if(this.iD==bahnhof.getID()){
+		if(this.id==bahnhof.getId()){
 			return true;
 		}
 		else{

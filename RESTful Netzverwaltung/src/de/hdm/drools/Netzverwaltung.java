@@ -1,7 +1,9 @@
 package de.hdm.drools;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
@@ -18,7 +20,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.glassfish.jersey.server.ChunkedOutput;
 
+import de.hdm.drools.abmeldung.BahnhofAbmeldung;
+import de.hdm.drools.abmeldung.KnotenpunktAbmeldung;
+import de.hdm.drools.abmeldung.ZugAbmeldung;
 import de.hdm.drools.anmeldung.BahnhofAnmeldung;
 import de.hdm.drools.anmeldung.KnotenpunktAnmeldung;
 import de.hdm.drools.anmeldung.ZugAnmeldung;
@@ -47,6 +53,7 @@ public class Netzverwaltung {
 	private static Vector<Bahnhof> bahnhoefe = new Vector<Bahnhof>();
 	private static Vector<Zug> zuege = new Vector<Zug>();
 	private static Vector<Strecke> strecken = new Vector<Strecke>();
+	
 	
 	/**
 	 * Fügt dem Vector knotenpunkte einen neuen Knotenpunkt hinzu.
@@ -87,8 +94,8 @@ public class Netzverwaltung {
 	public void knotenpunktAnmelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse){
 		URI adresse = URI.create(req.getRemoteAddr());
-		for(int j=0;j<bahnhoefe.size();j++){
-			if(adresse.equals(bahnhoefe.get(j))){
+		for(int j=0;j<knotenpunkte.size();j++){
+			if(adresse.equals(knotenpunkte.get(j))){
 				asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 			}
 		}
@@ -106,14 +113,8 @@ public class Netzverwaltung {
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
-			for(int i=0;i<knotenpunkte.size();i++){
-				if(knotenpunkt.equals(knotenpunkte.get(i))){
-					knotenpunkte.get(i).setAdresse(null);
-					KnowledgeBaseThread.knotenpunktAbmelden(knotenpunkt);
-					return Response.ok().build();
-				}
-			}
-			return Response.status(HttpStatus.NOT_FOUND_404).build();
+			KnowledgeBaseThread.knotenpunktAbmelden(new KnotenpunktAbmeldung(knotenpunkt));
+			return Response.ok().build();
 		}
 	}
 	
@@ -137,19 +138,14 @@ public class Netzverwaltung {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response bahnhofAbmelden(@Context HttpServletRequest req,
 			@NotNull Bahnhof bahnhof){
+		System.out.println(req.getRemoteAddr());
 		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(bahnhof.getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
-			for(int i=0;i<bahnhoefe.size();i++){
-				if(bahnhof.equals(bahnhoefe.get(i))){
-					bahnhoefe.get(i).setAdresse(null);
-					KnowledgeBaseThread.bahnhofAbmelden(bahnhof);
-					return Response.ok().build();
-				}
-			}
-			return Response.status(HttpStatus.NOT_FOUND_404).build();
+			KnowledgeBaseThread.bahnhofAbmelden(new BahnhofAbmeldung(bahnhof));
+			return Response.ok().build();
 		}
 	}
 	
@@ -159,8 +155,8 @@ public class Netzverwaltung {
 	public void zugAnmelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse){
 		URI adresse = URI.create(req.getRemoteAddr());
-		for(int j=0;j<bahnhoefe.size();j++){
-			if(adresse.equals(bahnhoefe.get(j))){
+		for(int j=0;j<zuege.size();j++){
+			if(adresse.equals(zuege.get(j))){
 				asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 			}
 		}
@@ -178,14 +174,8 @@ public class Netzverwaltung {
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
 		else{
-			for(int i=0;i<zuege.size();i++){
-				if(zug.equals(zuege.get(i))){
-					zuege.get(i).setAdresse(null);
-					KnowledgeBaseThread.zugAbmelden(zug);
-					return Response.ok().build();
-				}
-			}
-			return Response.status(HttpStatus.NOT_FOUND_404).build();
+			KnowledgeBaseThread.zugAbmelden(new ZugAbmeldung(zug));
+			return Response.ok().build();
 		}
 	}
 	
@@ -196,20 +186,8 @@ public class Netzverwaltung {
 	public void 	fahrtAnfrageStellen(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtAnfrage fahrtanfrage){
-		URI adresse=URI.create(req.getRemoteAddr());
-		if(!adresse.equals(fahrtanfrage.getZug().getAdresse())){
-			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
-		}
-		else{
-			for(int i=0;i<strecken.size();i++){
-				if(fahrtanfrage.getStrecke().equals(strecken.get(i))){
-					KnowledgeBaseThread
-					.fahrtAnfragen(new FahrtAnfrageMitAsyncResponse(fahrtanfrage
-							,asyncResponse));
-				}
-			}
-			asyncResponse.resume(Response.status(HttpStatus.NOT_FOUND_404).build());
-		}
+		KnowledgeBaseThread.fahrtAnfragen(new FahrtAnfrageMitAsyncResponse(fahrtanfrage
+			,asyncResponse));
 	}
 	
 	@Path("/fahrt/beginn")
@@ -219,20 +197,8 @@ public class Netzverwaltung {
 	public void 	fahrtBeginnMelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull FahrtBeginn fahrtbeginn){
-		URI adresse=URI.create(req.getRemoteAddr());
-		if(!adresse.equals(fahrtbeginn.getZug().getAdresse())){
-			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
-		}
-		else{
-			for(int i=0;i<strecken.size();i++){
-				if(fahrtbeginn.getStrecke().equals(strecken.get(i))){
-					KnowledgeBaseThread
-					.fahrtBeginn(new FahrtBeginnMitAsyncResponse(fahrtbeginn,
-							asyncResponse));
-				}
-			}
-			asyncResponse.resume(Response.status(HttpStatus.NOT_FOUND_404).build());
-		}
+		KnowledgeBaseThread.fahrtBeginn(new FahrtBeginnMitAsyncResponse(fahrtbeginn,
+			asyncResponse));
 	}
 	
 	@Path("/fahrt/abschluss")
@@ -240,20 +206,8 @@ public class Netzverwaltung {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response fahrtAbschlussMelden(@Context HttpServletRequest req,
 			@NotNull FahrtAbschluss fahrtabschluss){
-		URI adresse=URI.create(req.getRemoteAddr());
-		if(!adresse.equals(fahrtabschluss.getZug().getAdresse())){
-			return Response.status(HttpStatus.FORBIDDEN_403).build();
-		}
-		else{
-			for(int i=0;i<strecken.size();i++){
-				if(fahrtabschluss.getStrecke().equals(strecken.get(i))){
-					KnowledgeBaseThread
-					.fahrtAbschluss(fahrtabschluss);
-					return Response.ok().build();
-				}
-			}
-			return Response.status(HttpStatus.NOT_FOUND_404).build();
-		}
+		KnowledgeBaseThread.fahrtAbschluss(fahrtabschluss);
+			return Response.ok().build();
 	}
 	
 	@Path("/fahrt/lebenszeichen")
@@ -261,19 +215,8 @@ public class Netzverwaltung {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response lebenszeichenAbsetzen(@Context HttpServletRequest req,
 			@NotNull Lebenszeichen lebenszeichen){
-		URI adresse=URI.create(req.getRemoteAddr());
-		if(!adresse.equals(lebenszeichen.getZug().getAdresse())){
-			return Response.status(HttpStatus.FORBIDDEN_403).build();
-		}
-		else{
-			for(int i=0;i<strecken.size();i++){
-				if(lebenszeichen.getStrecke().equals(strecken.get(i))){
-					KnowledgeBaseThread.lebenszeichen(lebenszeichen);
-					return Response.ok().build();
-				}
-			}
-			return Response.status(HttpStatus.NOT_FOUND_404).build();
-		}
+		KnowledgeBaseThread.lebenszeichen(lebenszeichen);
+		return Response.ok().build();
 	}
 	
 	@Path("/knotenpunkt/{ID}")
@@ -285,7 +228,7 @@ public class Netzverwaltung {
 		}
 		else{
 			for(int i=0; i<knotenpunkte.size();i++){
-				if(knotenpunkte.get(i).getID()==id){
+				if(knotenpunkte.get(i).getId()==id){
 					return Response.ok(knotenpunkte.get(i)).build();
 				}
 			}
@@ -302,7 +245,7 @@ public class Netzverwaltung {
 		}
 		else{
 			for(int i=0; i<bahnhoefe.size();i++){
-				if(bahnhoefe.get(i).getID()==id){
+				if(bahnhoefe.get(i).getId()==id){
 					return Response.ok(bahnhoefe.get(i)).build();
 				}
 			}
@@ -319,7 +262,7 @@ public class Netzverwaltung {
 		}
 		else{
 			for(int i=0; i<zuege.size();i++){
-				if(zuege.get(i).getID()==id){
+				if(zuege.get(i).getId()==id){
 					return Response.ok(zuege.get(i)).build();
 				}
 			}
@@ -328,7 +271,7 @@ public class Netzverwaltung {
 	}
 	
 	@Path("/strecke/zu/knotenpunkt")
-	@GET
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response findStreckeZuKnotenpunktHin(@NotNull Knotenpunkt knotenpunkt){
@@ -347,7 +290,7 @@ public class Netzverwaltung {
 	}
 	
 	@Path("/strecke/von/knotenpunkt")
-	@GET
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response findStreckeVonKnotenpunktWeg(@NotNull Knotenpunkt knotenpunkt){
@@ -358,10 +301,39 @@ public class Netzverwaltung {
 			}
 		}
 		if(gefundeneStrecken.size()<1){
-			return Response.noContent().build();
+			return Response.serverError().build();
 		}
 		else{
 			return Response.ok(gefundeneStrecken.toArray()).build();
 		}
 	}
+	@Path("/netzverwaltung/beobachten")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public ChunkedOutput<String> beobachten() {
+		final ChunkedOutput<String> output = new ChunkedOutput<String>(String.class);
+        new Thread() {
+            public void run() {
+                try {
+                    String chunk;
+                    while ((chunk = NetzverwaltungsOutput.getNextString()) != null && !output.isClosed()) {
+                        output.write(chunk);
+                        TimeUnit.SECONDS.sleep(2);
+                    }
+                }
+                catch (IOException | InterruptedException e) {
+                	e.printStackTrace();
+                }
+                finally {
+                    try {
+						output.close();
+					}
+                    catch (IOException e) {
+						e.printStackTrace();
+					}
+                }
+            }
+        }.start();
+        return output;
+    }
 }

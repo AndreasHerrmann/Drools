@@ -1,6 +1,5 @@
 package de.hdm.drools;
 
-import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
@@ -12,6 +11,9 @@ import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
+import de.hdm.drools.abmeldung.BahnhofAbmeldung;
+import de.hdm.drools.abmeldung.KnotenpunktAbmeldung;
+import de.hdm.drools.abmeldung.ZugAbmeldung;
 import de.hdm.drools.anmeldung.BahnhofAnmeldung;
 import de.hdm.drools.anmeldung.KnotenpunktAnmeldung;
 import de.hdm.drools.anmeldung.ZugAnmeldung;
@@ -41,7 +43,8 @@ public class KnowledgeBaseThread extends Thread {
         Results results = kieBuilder.getResults();
         if( results.hasMessages(Message.Level.ERROR))
         	{
-            System.out.println( results.getMessages() );
+        	System.out.println( results.getMessages() );
+        	NetzverwaltungsOutput.println("KieSession konnte nicht gestartet werden!");
             throw new IllegalStateException( "### errors ###" );
         	}
 
@@ -50,7 +53,7 @@ public class KnowledgeBaseThread extends Thread {
 		KieContainer kieContainer = kService.newKieContainer(kService.getRepository().getDefaultReleaseId());
 		KieBase kBase = kieContainer.newKieBase(config);
 		kSession = kBase.newKieSession();
-		System.out.println("KieSession aufgebaut");
+		NetzverwaltungsOutput.println("KieSession aufgebaut");
 	}
 	//Startet die KieSession
 	public void run(){
@@ -62,9 +65,9 @@ public class KnowledgeBaseThread extends Thread {
 			}
 		finally{
 			kSession.halt();
-			System.out.println("KieSession angehalten");
+			NetzverwaltungsOutput.println("KieSession angehalten");
 			kSession.dispose();
-			System.out.println("KieSession Resourcen freigegeben");
+			NetzverwaltungsOutput.println("KieSession Resourcen freigegeben");
 		}
     }
 	public static void addBahnhof(Bahnhof bahnhof){
@@ -82,26 +85,20 @@ public class KnowledgeBaseThread extends Thread {
 	public static void bahnhofAnmelden(BahnhofAnmeldung bahnhofAnmeldung){
 		kSession.insert(bahnhofAnmeldung);
 	}
-	public static void bahnhofAbmelden(Bahnhof bahnhof){
-		FactHandle facthandle = kSession.getFactHandle(bahnhof);
-		bahnhof.setAdresse(null);
-		kSession.update(facthandle, bahnhof);
+	public static void bahnhofAbmelden(BahnhofAbmeldung bahnhofAbmeldung){
+		kSession.insert(bahnhofAbmeldung);
 	}
 	public static void knotenpunktAnmelden(KnotenpunktAnmeldung knotenpunktAnmeldung){
 		kSession.insert(knotenpunktAnmeldung);
 	}
-	public static void knotenpunktAbmelden(Knotenpunkt knotenpunkt){
-		FactHandle facthandle = kSession.getFactHandle(knotenpunkt);
-		knotenpunkt.setAdresse(null);
-		kSession.update(facthandle, knotenpunkt);
+	public static void knotenpunktAbmelden(KnotenpunktAbmeldung knotenpunktAbmeldung){
+		kSession.insert(knotenpunktAbmeldung);
 	}
 	public static void zugAnmelden(ZugAnmeldung zugAnmeldung){
 		kSession.insert(zugAnmeldung);
 	}
-	public static void zugAbmelden(Zug zug){
-		FactHandle facthandle = kSession.getFactHandle(zug);
-		zug.setAdresse(null);
-		kSession.update(facthandle, zug);
+	public static void zugAbmelden(ZugAbmeldung zugAbmeldung){
+		kSession.insert(zugAbmeldung);
 	}
 	public static void fahrtAnfragen(FahrtAnfrageMitAsyncResponse fahrtanfrage){
 		kSession.insert(fahrtanfrage);
@@ -111,8 +108,14 @@ public class KnowledgeBaseThread extends Thread {
 	}
 	public static void fahrtAbschluss(FahrtAbschluss fahrtabschluss){
 		kSession.insert(fahrtabschluss);
+		NetzverwaltungsOutput.println("FahrtAbschluss: Strecken-ID:"
+		+fahrtabschluss.getStrecke().getId()+" Zug-ID:"
+				+fahrtabschluss.getZug().getId());
 	}
 	public static void lebenszeichen(Lebenszeichen lebenszeichen){
 		kSession.insert(lebenszeichen);
+		NetzverwaltungsOutput.println("Lebenszeichen: Strecken-iD:"
+		+lebenszeichen.getStrecke().getId()+" Zug-ID:"
+				+lebenszeichen.getZug().getId());
 	}
 }

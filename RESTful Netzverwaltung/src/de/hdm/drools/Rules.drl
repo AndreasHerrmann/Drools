@@ -4,10 +4,12 @@ package de.hdm.drools
 //list any import classes here.
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
+import de.hdm.drools.NetzverwaltungsOutput;
 import de.hdm.drools.Netzverwaltung;
 import de.hdm.drools.resource.*;
 import de.hdm.drools.nachricht.*;
 import de.hdm.drools.anmeldung.*;
+import de.hdm.drools.abmeldung.*;
 
 //declare any global variables here
 declare BahnhofAnmeldung
@@ -17,6 +19,15 @@ declare ZugAnmeldung
 	@role(event)
 end
 declare KnotenpunktAnmeldung
+	@role(event)
+end
+declare BahnhofAbmeldung
+	@role(event)
+end
+declare ZugAbmeldung
+	@role(event)
+end
+declare KnotenpunktAbmeldung
 	@role(event)
 end
 declare FahrtErlaubnis
@@ -45,8 +56,21 @@ rule "Bahnhof anmelden"
         update($bahnhof);
         $bahnhofAnmeldung.setIstErledigt(true);
         update($bahnhofAnmeldung);
+        NetzverwaltungsOutput.println("BahnhofAnmeldung: "+$bahnhof.getName()+"(ID:"+$bahnhof.getId()+")");
         $bahnhofAnmeldung.getAsyncResponse().resume($bahnhof);
 
+end
+
+rule "Bahnhof abmelden"
+	when
+		$bahnhofAbmeldung:BahnhofAbmeldung(istErledigt==false) and
+		$bahnhof:Bahnhof(id==$bahnhofAbmeldung.bahnhof.id && adresse!=null)
+	then
+		$bahnhofAbmeldung.setIstErledigt(true);
+		update($bahnhofAbmeldung);
+		$bahnhof.setAdresse(null);
+		update($bahnhof);
+		NetzverwaltungsOutput.println("BahnhofAbmeldung: "+$bahnhof.getName()+"(ID:"+$bahnhof.getId()+")");
 end
 
 rule "Knotenpunkt anmelden"
@@ -58,8 +82,21 @@ rule "Knotenpunkt anmelden"
         update($knotenpunkt);
         $knotenpunktAnmeldung.setIstErledigt(true);
         update($knotenpunktAnmeldung);
+        NetzverwaltungsOutput.println("KnotenpunktAnmeldung: ID:"+$knotenpunkt.getId());
         $knotenpunktAnmeldung.getAsyncResponse().resume($knotenpunkt);
 
+end
+
+rule "Knotenpunkt abmelden"
+	when
+		$knotenpunktAbmeldung:KnotenpunktAbmeldung(istErledigt==false) and
+		$knotenpunkt:Knotenpunkt(id==$knotenpunktAbmeldung.knotenpunkt.id && adresse!=null)
+	then
+		$knotenpunktAbmeldung.setIstErledigt(true);
+		update($knotenpunktAbmeldung);
+		$knotenpunkt.setAdresse(null);
+		update($knotenpunkt);
+		NetzverwaltungsOutput.println("KnotenpunktAbmeldung: "+"ID:"+$knotenpunkt.getId());
 end
 
 rule "Zug anmelden"
@@ -71,105 +108,114 @@ rule "Zug anmelden"
 		update($zug);
 		$zugAnmeldung.setIstErledigt(true);
 		update($zugAnmeldung);
+		NetzverwaltungsOutput.println("ZugAnmeldung: ID:"+$zug.getId());
 		$zugAnmeldung.getAsyncResponse().resume($zug);
 
 end
 
+rule "Zug abmelden"
+	when
+		$zugAbmeldung:ZugAbmeldung(istErledigt==false) and
+		$zug:Zug(id==$zugAbmeldung.zug.id && adresse!=null)
+	then
+		$zugAbmeldung.setIstErledigt(true);
+		update($zugAbmeldung);
+		$zug.setAdresse(null);
+		update($zug);
+		NetzverwaltungsOutput.println("ZugAbmeldung: "+"ID:"+$zug.getId());
+end
+
 rule "Erste Fahrtanfrage beantworten"
-	activation-group "FahrtAnfrage"
+no-loop
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
-		$strecke:Strecke(iD==$fahrtAnfrage.strecke.iD) and
-		not FahrtBeginnMitAsyncResponse(strecke.iD==$strecke.iD && this before $fahrtAnfrage) and
-		not FahrtAbschluss(strecke.iD==$strecke.iD && this before $fahrtAnfrage)
+		$strecke:Strecke(id==$fahrtAnfrage.strecke.id) and
+		not FahrtBeginnMitAsyncResponse(strecke.id==$strecke.id && this before $fahrtAnfrage) and
+		not FahrtAbschluss(strecke.id==$strecke.id && this before $fahrtAnfrage)
 	then
 		$fahrtAnfrage.setIstErledigt(true);
 		update($fahrtAnfrage);
 		FahrtErlaubnis neueFahrtErlaubnis = new FahrtErlaubnis($fahrtAnfrage.getZug(),$strecke);
 		insert(neueFahrtErlaubnis);
+		NetzverwaltungsOutput.println("FahrtErlaubnis erteilt: Strecken-ID:"+$strecke.getId()+" Zug-ID:"+$fahrtAnfrage.getZug().getId());
 		$fahrtAnfrage.getAsyncResponse().resume(Response.ok(neueFahrtErlaubnis).build());
 end
 
 rule "Fahrtanfrage positiv beantworten"
-	activation-group "FahrtAnfrage"
+no-loop
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
-		$strecke:Strecke(iD==$fahrtAnfrage.strecke.iD) and
-		$fahrtabschluss:FahrtAbschluss(strecke.iD==$fahrtAnfrage.strecke.iD) and
+		$strecke:Strecke(id==$fahrtAnfrage.strecke.id) and
+		$fahrtabschluss:FahrtAbschluss(strecke.id==$fahrtAnfrage.strecke.id) and
 		not FahrtAbschluss(this after $fahrtabschluss) and
-		not FahrtErlaubnis(strecke.iD==$strecke.iD && this after $fahrtabschluss) and
-		not FahrtBeginnMitAsyncResponse(strecke.iD==$strecke.iD && this after $fahrtabschluss && istErledigt==true && positivBeantwortet==true)
+		not FahrtErlaubnis(strecke.id==$strecke.id && this after $fahrtabschluss) and
+		not FahrtBeginnMitAsyncResponse(strecke.id==$strecke.id && this after $fahrtabschluss && istErledigt==true && positivBeantwortet==true)
 	then
 		$fahrtAnfrage.setIstErledigt(true);
 		update($fahrtAnfrage);
 		FahrtErlaubnis neueFahrtErlaubnis = new FahrtErlaubnis($fahrtAnfrage.getZug(),$strecke);
 		insert(neueFahrtErlaubnis);
+		NetzverwaltungsOutput.println("FahrtErlaubnis erteilt: Strecken-ID:"+$strecke.getId()+" Zug-ID:"+$fahrtAnfrage.getZug().getId());
 		$fahrtAnfrage.getAsyncResponse().resume(Response.ok(neueFahrtErlaubnis).build());
 end
 
 rule "Fahrtanfrage negativ beantworten"
-	activation-group "FahrtAnfrage"
+no-loop
 	when
 		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==false) and
-		( ($fahrtErlaubnis:FahrtErlaubnis(strecke.iD==$fahrtAnfrage.strecke.iD) over window:time(2m) and
-		 not FahrtAbschluss(strecke.iD==$fahrtErlaubnis.strecke.iD && zug.iD==$fahrtErlaubnis.zug.iD && this after $fahrtErlaubnis)) or
-		 ( $fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==true && positivBeantwortet==true && strecke.iD==$fahrtAnfrage.strecke.iD) and
-		 not FahrtAbschluss(strecke.iD==$fahrtBeginn.strecke.iD && zug.iD==$fahrtBeginn.zug.iD && this after $fahrtBeginn)) or
-		 not Strecke(iD==$fahrtAnfrage.strecke.iD))
+		( ($fahrtErlaubnis:FahrtErlaubnis(strecke.id==$fahrtAnfrage.strecke.id) over window:time(2m) and
+		 not FahrtAbschluss(strecke.id==$fahrtErlaubnis.strecke.id && zug.id==$fahrtErlaubnis.zug.id && this after $fahrtErlaubnis)) or
+		 ( $fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==true && positivBeantwortet==true && strecke.id==$fahrtAnfrage.strecke.id) and
+		 not FahrtAbschluss(strecke.id==$fahrtBeginn.strecke.id && zug.id==$fahrtBeginn.zug.id && this after $fahrtBeginn)) or
+		 not Strecke(id==$fahrtAnfrage.strecke.id))
 	then
 		$fahrtAnfrage.setIstErledigt(true);
 		update($fahrtAnfrage);
+		NetzverwaltungsOutput.println("FahrtErlaubnis abgelehnt: Strecken-ID:"+$fahrtAnfrage.getStrecke().getId()+" Zug-ID:"+$fahrtAnfrage.getZug().getId());
 		$fahrtAnfrage.getAsyncResponse().cancel();
 end
 
 rule "Ersten Fahrtbeginn beantworten"
-	activation-group "FahrtBeginn"
+no-loop
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
-		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD && this before $fahrtBeginn) and
-		not FahrtBeginnMitAsyncResponse(istErledigt==true && strecke.iD==$fahrtBeginn.strecke.iD && this before $fahrtBeginn)
+		$fahrtAnfrage:FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.id==$fahrtBeginn.zug.id && strecke.id==$fahrtBeginn.strecke.id && this before $fahrtBeginn) and
+		not FahrtBeginnMitAsyncResponse(istErledigt==true && strecke.id==$fahrtBeginn.strecke.id && this before $fahrtBeginn)
 	then
 		$fahrtBeginn.setIstErledigt(true);
 		$fahrtBeginn.setPositivBeantwortet(true);
 		update($fahrtBeginn);
+		NetzverwaltungsOutput.println("FahrtBeginn: Strecken-ID:"+$fahrtBeginn.getStrecke().getId()+" Zug-ID:"+$fahrtBeginn.getZug().getId());
 		$fahrtBeginn.getAsyncResponse().resume(Response.ok().build());
 end
 
 rule "Fahrtbeginn positiv beantworten"
-	activation-group "FahrtBeginn"
+no-loop
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
-		exists FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD) over window:time(2m) and
-		exists FahrtErlaubnis(zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD) over window:time(2m) and
-		not ($fahrtBeginnZwei:FahrtBeginn(strecke.iD==$fahrtBeginn.strecke.iD && this before $fahrtBeginn) and
-		not FahrtAbschluss(strecke.iD==$fahrtBeginnZwei.strecke.iD && zug.iD==$fahrtBeginnZwei.zug.iD && this after $fahrtBeginnZwei))
+		exists FahrtAnfrageMitAsyncResponse(istErledigt==true && zug.id==$fahrtBeginn.zug.id && strecke.id==$fahrtBeginn.strecke.id) over window:time(2m) and
+		exists FahrtErlaubnis(zug.id==$fahrtBeginn.zug.id && strecke.id==$fahrtBeginn.strecke.id) over window:time(2m) and
+		not ($fahrtBeginnZwei:FahrtBeginn(strecke.id==$fahrtBeginn.strecke.id && this before $fahrtBeginn) and
+		not FahrtAbschluss(strecke.id==$fahrtBeginnZwei.strecke.id && zug.id==$fahrtBeginnZwei.zug.id && this after $fahrtBeginnZwei))
 	then
 		$fahrtBeginn.setIstErledigt(true);
 		$fahrtBeginn.setPositivBeantwortet(true);
 		update($fahrtBeginn);
+		NetzverwaltungsOutput.println("FahrtBeginn: Strecken-ID:"+$fahrtBeginn.getStrecke().getId()+" Zug-ID:"+$fahrtBeginn.getZug().getId());
 		$fahrtBeginn.getAsyncResponse().resume(Response.ok().build());
 end
 
 rule "Fahrtbeginn negativ beantworten"
-	activation-group "FahrtBeginn"
+no-loop
 	when
 		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==false) and
-		( (not FahrtErlaubnis(strecke.iD==$fahrtBeginn.strecke.iD && zug.iD==$fahrtBeginn.zug.iD && this before $fahrtBeginn) over window:time(2m)) or
-		 ($fahrtBeginnZwei:FahrtBeginnMitAsyncResponse(istErledigt==true && strecke.iD==$fahrtBeginn.strecke.iD && positivBeantwortet==true) and
-		 not FahrtAbschluss(strecke.iD==$fahrtBeginnZwei.strecke.iD && zug.iD==$fahrtBeginnZwei.zug.iD && this after $fahrtBeginnZwei)))
+		( (not FahrtErlaubnis(strecke.id==$fahrtBeginn.strecke.id && zug.id==$fahrtBeginn.zug.id && this before $fahrtBeginn) over window:time(2m)) or
+		 ($fahrtBeginnZwei:FahrtBeginnMitAsyncResponse(istErledigt==true && strecke.id==$fahrtBeginn.strecke.id && positivBeantwortet==true) and
+		 not FahrtAbschluss(strecke.id==$fahrtBeginnZwei.strecke.id && zug.id==$fahrtBeginnZwei.zug.id && this after $fahrtBeginnZwei)))
 	then
 		$fahrtBeginn.setIstErledigt(true);
 		$fahrtBeginn.setPositivBeantwortet(false);
 		update($fahrtBeginn);
+		NetzverwaltungsOutput.println("FahrtBeginn abgelehnt: Strecken-ID:"+$fahrtBeginn.getStrecke().getId()+" Zug-ID:"+$fahrtBeginn.getZug().getId());
 		$fahrtBeginn.getAsyncResponse().cancel();
-end
-
-rule "Fehlendes Lebenszeichen"
-	when
-		$fahrtBeginn:FahrtBeginnMitAsyncResponse(istErledigt==true && positivBeantwortet==true) and
-		not FahrtAbschluss(strecke.iD==$fahrtBeginn.strecke.iD && zug.iD==$fahrtBeginn.zug.iD && this after $fahrtBeginn) and
-		not Lebenszeichen(zug.iD==$fahrtBeginn.zug.iD && strecke.iD==$fahrtBeginn.strecke.iD && this after $fahrtBeginn) over window:time(4m)
-	then
-		System.out.println("Fehlendes Lebenszeichen! (Strecke-ID: "+$fahrtBeginn.getStrecke().getID()+" Zug-ID: "+$fahrtBeginn.getZug().getID()+")");
-		insert(new FahrtAbschluss($fahrtBeginn.getZug(),$fahrtBeginn.getStrecke()));
 end
