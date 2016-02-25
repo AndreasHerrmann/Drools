@@ -31,6 +31,5 @@ public class BahnhofServletListener implements ServletContextListener{
 		kieSessionThread = new KnowledgeBaseThread();
 		kieSessionThread.start();
 		System.out.println("KieSession gestartet");
-		BahnhofController.anmelden();
 	}
 }

@@ -45,6 +45,7 @@ public class KnowledgeBaseThread extends Thread {
 			KieBase kBase = kieContainer.newKieBase(config);
 			kSession = kBase.newKieSession();
 			System.out.println("KieSession aufgebaut");
+			BahnhofController.anmelden();
 			kSession.fireUntilHalt();
 		}
 		catch(Throwable t){
@@ -66,9 +67,7 @@ public class KnowledgeBaseThread extends Thread {
 	public static void abfahrtMelden(Abfahrt abfahrt){
 		kSession.insert(abfahrt);
 	}
-	public static void gleiseEinfuegen(Gleis[] gleise){
-		for(int i=0;i<gleise.length;i++){
-			kSession.insert(gleise[i]);
-		}
+	public static void gleisEinfuegen(Gleis gleis){
+			kSession.insert(gleis);
 	}
 }		

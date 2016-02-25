@@ -6,7 +6,6 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -31,12 +30,13 @@ import de.hdm.drools.resource.Bahnhof;
 import de.hdm.drools.resource.Gleis;
 import de.hdm.drools.resource.Knotenpunkt;
 import de.hdm.drools.resource.Strecke;
+import de.hdm.drools.resource.Zug;
 
 @Path("/")
 public class BahnhofController {
 	private static WebTarget netzverwaltung;
-	private static Bahnhof bahnhof=null;
-	private static Gleis[] gleise;
+	private static Bahnhof bahnhof;
+	private static Vector<Gleis> gleise;
 	private static Strecke[] wegfuehrendeStrecken;
 	
 	public static boolean anmelden(){
@@ -63,9 +63,11 @@ public class BahnhofController {
 				}
 			}
 			//Gleise erstellen. Erstes Gleis hat die Nummer 1
-			gleise = new Gleis[bahnhof.getGleisAnzahl()];
+			gleise = new Vector<Gleis>();
 			for (int i=0;i<bahnhof.getGleisAnzahl();i++){
-				gleise[i]=new Gleis(i+1);
+				Gleis gleis = new Gleis(i+1);
+				gleise.add(gleis);
+				KnowledgeBaseThread.gleisEinfuegen(gleis);
 			}
 			return true;
 		}
@@ -82,7 +84,7 @@ public class BahnhofController {
 	@Path("/erneutAnmelden")
 	@POST
 	public Response erneutAnmelden(@Context HttpServletRequest req){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create("http://"+req.getRemoteAddr());
 		if(!adresse.equals(Config.netzverwaltungAdresse)){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -104,21 +106,28 @@ public class BahnhofController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public void einfahrtAnfragen(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
-			@NotNull EinfahrtAnfrage fahrtanfrage){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+			EinfahrtAnfrage fahrtanfrage){
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(fahrtanfrage.getZug().getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
 		}
 		else{
-			for(int i=0;i<gleise.length;i++){
-				if(fahrtanfrage.getGleis().equals(gleise[i])){
-					KnowledgeBaseThread
-					.fahrtAnfragen(new EinfahrtAnfrageMitAsyncResponse(fahrtanfrage
+			KnowledgeBaseThread.fahrtAnfragen(new EinfahrtAnfrageMitAsyncResponse(fahrtanfrage
 							,asyncResponse));
-				}
-			}
-			asyncResponse.resume(Response.status(HttpStatus.NOT_FOUND_404).build());
 		}
+	}
+	
+	@Path("/einfahrtAnfragenOhneGleis")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public void einfahrtAnfragenOhneGleis(@Context HttpServletRequest req,
+			@Suspended final AsyncResponse asyncResponse,
+			Zug zug){
+		EinfahrtAnfrage fahrtanfrage = new EinfahrtAnfrage(zug,null);
+		System.out.println(fahrtanfrage.getZug().getid());
+		KnowledgeBaseThread.fahrtAnfragen(new EinfahrtAnfrageMitAsyncResponse(fahrtanfrage
+						,asyncResponse));
 	}
 	
 	@Path("/einfahrtMelden")
@@ -128,19 +137,13 @@ public class BahnhofController {
 	public void einfahrtMelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull Einfahrt einfahrt){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(einfahrt.getZug().getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.FORBIDDEN_403).build());
 		}
 		else{
-			for(int i=0;i<gleise.length;i++){
-				if(einfahrt.getGleis().equals(gleise[i])){
-					KnowledgeBaseThread
-					.einfahrtMelden(new EinfahrtMitAsyncResponse(einfahrt
+			KnowledgeBaseThread.einfahrtMelden(new EinfahrtMitAsyncResponse(einfahrt
 							,asyncResponse));
-				}
-			}
-			asyncResponse.resume(Response.status(HttpStatus.NOT_FOUND_404).build());
 		}
 	}
 	
@@ -149,7 +152,7 @@ public class BahnhofController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response abfahrtMelden(@Context HttpServletRequest req,
 			@NotNull Abfahrt abfahrt){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(abfahrt.getZug().getAdresse())){
 			return Response.status(HttpStatus.FORBIDDEN_403).build();
 		}
@@ -160,7 +163,7 @@ public class BahnhofController {
 	}
 	
 	@Path("/strecke")
-	@GET
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response findStreckenZuKnotenpunkt(@NotNull Knotenpunkt knotenpunkt){
@@ -170,11 +173,6 @@ public class BahnhofController {
 				gefundeneStrecken.add(wegfuehrendeStrecken[i]);
 			}
 		}
-		if(gefundeneStrecken.size()>0){
-			return Response.ok(gefundeneStrecken.toArray()).build();
-		}
-		else{
-			return Response.status(HttpStatus.NOT_FOUND_404).build();
-		}
+		return Response.ok(gefundeneStrecken.toArray()).build();
 	}
 }
