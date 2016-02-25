@@ -35,7 +35,7 @@ rule "AuffahrtAnfrage positiv beantworten"
         $auffahrtAnfrage:AuffahrtAnfrageMitAsyncResponse(istErledigt==false) and
         $auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==true) and
         not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldung) and
-        exists Abfahrt(zug.iD==$auffahrtMeldung.zug.iD && this after $auffahrtMeldung)
+        exists Abfahrt(zug.id==$auffahrtMeldung.zug.id && this after $auffahrtMeldung)
     then
         $auffahrtAnfrage.setIstErledigt(true);
       	update($auffahrtAnfrage);
@@ -48,7 +48,7 @@ rule "AuffahrtAnfrage negativ beantworten"
 		$auffahrtAnfrage:AuffahrtAnfrageMitAsyncResponse(istErledigt==false) and
         $auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==true) and
         not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldung) and
-        not Abfahrt(zug.iD==$auffahrtMeldung.zug.iD && this after $auffahrtMeldung)
+        not Abfahrt(zug.id==$auffahrtMeldung.zug.id && this after $auffahrtMeldung)
 	then
 		$auffahrtAnfrage.setIstErledigt(true);
       	update($auffahrtAnfrage);
@@ -59,7 +59,7 @@ rule "Erste AuffahrtMeldung beantworten"
 	activation-group "AuffahrtMeldung"
 	when
 		$auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==false) and
-		AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$auffahrtMeldung.zug.iD && this before $auffahrtMeldung) over window:time(2m) and
+		AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.id==$auffahrtMeldung.zug.id && this before $auffahrtMeldung) over window:time(2m) and
        	not Abfahrt() and
        	not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this before $auffahrtMeldung)
 	then
@@ -72,10 +72,10 @@ rule "AuffahrtMeldung positiv beantworten"
 	activation-group "AuffahrtMeldung"
 	when
 		$auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==false) and
-		exists AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$auffahrtMeldung.zug.iD && this before $auffahrtMeldung) over window:time(2m) and
+		exists AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.id==$auffahrtMeldung.zug.id && this before $auffahrtMeldung) over window:time(2m) and
 		$auffahrtMeldungDavor:AuffahrtMeldungMitAsyncResponse(istErledigt==true && this before $auffahrtMeldung) and
 		not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldungDavor) and
-		exists Abfahrt(zug.iD==$auffahrtMeldungDavor.zug.iD && this after $auffahrtMeldungDavor)
+		exists Abfahrt(zug.id==$auffahrtMeldungDavor.zug.id && this after $auffahrtMeldungDavor)
 	then
 		$auffahrtMeldung.setIstErledigt(true);
 		update($auffahrtMeldung);
@@ -86,10 +86,10 @@ rule "AuffahrtMeldung negativ beantworten"
 	activation-group "AuffahrtMeldung"
 	when
 		$auffahrtMeldung:AuffahrtMeldungMitAsyncResponse(istErledigt==false) and
-		( not AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.iD==$auffahrtMeldung.zug.iD && this before $auffahrtMeldung) over window:time(2m) or
+		( not AuffahrtAnfrageMitAsyncResponse(istErledigt==true && zug.id==$auffahrtMeldung.zug.id && this before $auffahrtMeldung) over window:time(2m) or
 		( $auffahrtMeldungDavor:AuffahrtMeldungMitAsyncResponse(istErledigt==true && this before $auffahrtMeldung) and
 			not AuffahrtMeldungMitAsyncResponse(istErledigt==true && this after $auffahrtMeldungDavor) and
-			not Abfahrt(zug.iD==$auffahrtMeldungDavor.zug.iD && this after $auffahrtMeldungDavor)))
+			not Abfahrt(zug.id==$auffahrtMeldungDavor.zug.id && this after $auffahrtMeldungDavor)))
 	then
 		$auffahrtMeldung.setIstErledigt(true);
 		update($auffahrtMeldung);

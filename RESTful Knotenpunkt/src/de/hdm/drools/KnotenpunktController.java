@@ -6,7 +6,6 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -54,33 +53,28 @@ public class KnotenpunktController {
 	}
 	
 	@Path("/strecke")
-	@GET
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response findStreckeByZiel(Knotenpunkt knotenpunkt){
+	public Response findStreckeByZiel(@NotNull Knotenpunkt knotenpunkt){
 		Vector<Strecke> gefundeneStrecken = new Vector<Strecke>();
 		for (int i=0;i<wegfuehrendeStrecken.length;i++){
 			if(wegfuehrendeStrecken[i].getZiel().equals(knotenpunkt)){
 				gefundeneStrecken.add(wegfuehrendeStrecken[i]);
 			}
 		}
-		if(gefundeneStrecken.size()>0){
-			Strecke[] strecken = new Strecke[gefundeneStrecken.size()];
-			return Response.ok(gefundeneStrecken.toArray(strecken)).build();
-		}
-		else{
-			return Response.noContent().build();
-		}
+		Strecke[] strecken = new Strecke[gefundeneStrecken.size()];
+		return Response.ok(gefundeneStrecken.toArray(strecken)).build();
 	}
 	
-	@Path("/auffahrtAnfragen/")
+	@Path("/auffahrtAnfragen")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public void auffahrtAnfragen(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull Zug zug){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(zug.getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 		}
@@ -89,13 +83,13 @@ public class KnotenpunktController {
 		}
 	}
 	
-	@Path("/auffahrtMelden/")
+	@Path("/auffahrtMelden")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void auffahrtMelden(@Context HttpServletRequest req,
 			@Suspended final AsyncResponse asyncResponse,
 			@NotNull Zug zug){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(zug.getAdresse())){
 			asyncResponse.resume(Response.status(HttpStatus.BAD_REQUEST_400).build());
 		}
@@ -104,11 +98,11 @@ public class KnotenpunktController {
 		}
 	}
 	
-	@Path("/abfahrtMelden/")
+	@Path("/abfahrtMelden")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response abfahrtMelden(@Context HttpServletRequest req,@NotNull Zug zug){
-		URI adresse=URI.create(req.getRemoteAddr()+Integer.toString(req.getRemotePort()));
+		URI adresse=URI.create(req.getRemoteAddr());
 		if(!adresse.equals(zug.getAdresse())){
 			return Response.status(HttpStatus.BAD_REQUEST_400).build();
 		}

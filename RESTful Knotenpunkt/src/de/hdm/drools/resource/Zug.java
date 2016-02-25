@@ -9,7 +9,7 @@ public class Zug extends Resource {
 		
 	}
 	public Zug(long iD){
-		this.iD=iD;
+		this.id=iD;
 	}
 	public URI getAdresse() {
 		return adresse;
@@ -18,7 +18,7 @@ public class Zug extends Resource {
 		this.adresse = adresse;
 	}
 	public boolean equals(Zug zug){
-		if(this.iD==zug.getiD()){
+		if(this.id==zug.getid()){
 			return true;
 		}
 		else{
