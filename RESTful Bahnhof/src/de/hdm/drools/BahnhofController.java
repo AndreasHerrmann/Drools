@@ -36,7 +36,7 @@ import de.hdm.drools.resource.Zug;
  * REST-Controller des Bahnhofs. Verarbeitet alle Anfragen, die an den Bahnhof gesendet werden.
  * @author Andreas Herrmann
  * @param netzverwaltung Ein {@link javax.ws.rs.client.WebTarget}, das auf die Netzverwaltung zeigt
- * @param bahnhof Beinhaltet die Daten des Bahnhofs, die im von der Netzverwaltung geschickt werden
+ * @param bahnhof Beinhaltet die Daten des Bahnhofs, die ihm von der Netzverwaltung geschickt werden
  * @param gleise Die Gleise des Bahnhofs
  * @param wegfuehrendeStrecken Alle Strecken, die vom Bahnhof wegfuehren
  */

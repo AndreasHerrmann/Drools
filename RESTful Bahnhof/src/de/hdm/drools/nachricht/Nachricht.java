@@ -6,11 +6,17 @@ import de.hdm.drools.resource.Zug;
 /**
  * Abstrakte Oberklasse für alle Nachrichten, die ein Bahnhof erhalten kann.
  * @author Andreas Herrmann
- * @param zug Der Zug auf den sich diese Nachricht bezieht
- * @param gleis Das Gleis auf den sich diese Nachricht bezieht
+ * @param zug Der {@link de.hdm.drools.resource.Zug} auf den sich diese Nachricht bezieht
+ * @param gleis Das {@link de.hdm.drools.resource.Gleis} auf den sich diese Nachricht bezieht
  */
 public abstract class Nachricht {
+	/**
+	 * Der {@link de.hdm.drools.resource.Zug} auf den sich diese Nachricht bezieht
+	 */
 	protected Zug zug;
+	/**
+	 * Das {@link de.hdm.drools.resource.Gleis} auf den sich diese Nachricht bezieht
+	 */
 	protected Gleis gleis;
 	
 	public Nachricht(){

@@ -30,7 +30,7 @@ public class KnowledgeBaseThread extends Thread {
 	private static KieSession kSession=null;
 	/**
 	 * Wird beim Start des Threads aufgerufen. Erstellt die {@link org.kie.api.runtime.KieSession}
-	 * und lässt diese feuern bis der Thrad angehalten wird.
+	 * und lässt diese feuern bis der Thread angehalten wird.
 	 * Wenn der Thread angehalten wird, dann beendet er die {@link org.kie.api.runtime.KieSession}
 	 * und gibt deren Resourcen frei.
 	 */

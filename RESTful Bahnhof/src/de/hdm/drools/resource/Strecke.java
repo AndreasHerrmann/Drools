@@ -7,7 +7,13 @@ package de.hdm.drools.resource;
  * @param ziel Der {@link Knotenpunkt}, an dem die Strecke endet
  */
 public class Strecke extends Resource {
+	/**
+	 * Der {@link Knotenpunkt}, an dem die Strecke beginnt
+	 */
 	private Knotenpunkt start;
+	/**
+	 * Der {@link Knotenpunkt}, an dem die Strecke endet
+	 */
 	private Knotenpunkt ziel;
 	
 	/**

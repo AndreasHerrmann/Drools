@@ -6,6 +6,9 @@ package de.hdm.drools.resource;
  * @param id Die ID der jeweiligen Resource
  */
 public abstract class Resource {
+	/**
+	 * Die ID der Resource
+	 */
 	protected long id;
 	
 	public long getid() {
