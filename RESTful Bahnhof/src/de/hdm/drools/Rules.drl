@@ -27,7 +27,7 @@ rule "Erste EinfahrtAnfrage ohne Gleisangabe beantworten"
     when
         $einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis==null) and
         $gleis:Gleis() and
-        not EinfahrtAnfrageMitAsyncResponse(istErledigt==true && gleis.nummer==$gleis.nummer)
+        not EinfahrtAnfrageMitAsyncResponse(istErledigt==true && gleis.nummer==$gleis.nummer && this before $einfahrtAnfrage)
         not EinfahrtErlaubnis(gleis.nummer==$gleis.nummer) and
         not EinfahrtMitAsyncResponse(gleis.nummer==$gleis.nummer)
     then
@@ -58,7 +58,7 @@ rule "Erste EinfahrtAnfrage mit Gleisangabe beantworten"
 	when
 		$einfahrtAnfrage:EinfahrtAnfrageMitAsyncResponse(istErledigt==false && gleis!=null) and
         exists Gleis(nummer==$einfahrtAnfrage.gleis.nummer) and
-        not EinfahrtAnfrageMitAsyncResponse(istErledigt==true && gleis.nummer==$einfahrtAnfrage.gleis.nummer)
+        not EinfahrtAnfrageMitAsyncResponse(istErledigt==true && gleis.nummer==$einfahrtAnfrage.gleis.nummer && this before $einfahrtAnfrage)
         not EinfahrtErlaubnis(gleis.nummer==$einfahrtAnfrage.gleis.nummer) and
         not EinfahrtMitAsyncResponse(gleis.nummer==$einfahrtAnfrage.gleis.nummer)
 	then
