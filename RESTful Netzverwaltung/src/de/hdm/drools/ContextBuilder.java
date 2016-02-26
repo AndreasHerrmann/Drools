@@ -13,7 +13,7 @@ import de.hdm.drools.resource.Zug;
  *
  */
 public class ContextBuilder {
-	public ContextBuilder(){
+	public ContextBuilder(Netzverwaltung netzverwaltung){
 		//16 Knotenpunkte erstellen
 		Knotenpunkt knotenpunkt1 = new Knotenpunkt(1);
 		Knotenpunkt knotenpunkt2 = new Knotenpunkt(2,true);
@@ -108,65 +108,65 @@ public class ContextBuilder {
 		
 		//Alle Objekte den entsprechenden Vectoren der Netzverwaltung hinzufügen
 		//Knotenpunkte
-		Netzverwaltung.addKnotenpunkt(knotenpunkt1);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt2);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt3);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt4);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt5);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt6);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt7);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt8);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt9);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt10);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt11);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt12);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt13);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt14);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt15);
-		Netzverwaltung.addKnotenpunkt(knotenpunkt16);
+		netzverwaltung.addKnotenpunkt(knotenpunkt1);
+		netzverwaltung.addKnotenpunkt(knotenpunkt2);
+		netzverwaltung.addKnotenpunkt(knotenpunkt3);
+		netzverwaltung.addKnotenpunkt(knotenpunkt4);
+		netzverwaltung.addKnotenpunkt(knotenpunkt5);
+		netzverwaltung.addKnotenpunkt(knotenpunkt6);
+		netzverwaltung.addKnotenpunkt(knotenpunkt7);
+		netzverwaltung.addKnotenpunkt(knotenpunkt8);
+		netzverwaltung.addKnotenpunkt(knotenpunkt9);
+		netzverwaltung.addKnotenpunkt(knotenpunkt10);
+		netzverwaltung.addKnotenpunkt(knotenpunkt11);
+		netzverwaltung.addKnotenpunkt(knotenpunkt12);
+		netzverwaltung.addKnotenpunkt(knotenpunkt13);
+		netzverwaltung.addKnotenpunkt(knotenpunkt14);
+		netzverwaltung.addKnotenpunkt(knotenpunkt15);
+		netzverwaltung.addKnotenpunkt(knotenpunkt16);
 		//Bahnhöfe
-		Netzverwaltung.addBahnhof(stuttgart);
-		Netzverwaltung.addBahnhof(flughafen);
-		Netzverwaltung.addBahnhof(boeblingen);
-		Netzverwaltung.addBahnhof(leonberg);
-		Netzverwaltung.addBahnhof(plochingen);
+		netzverwaltung.addBahnhof(stuttgart);
+		netzverwaltung.addBahnhof(flughafen);
+		netzverwaltung.addBahnhof(boeblingen);
+		netzverwaltung.addBahnhof(leonberg);
+		netzverwaltung.addBahnhof(plochingen);
 		//Strecken
-		Netzverwaltung.addStrecke(strecke1);
-		Netzverwaltung.addStrecke(strecke2);
-		Netzverwaltung.addStrecke(strecke3);
-		Netzverwaltung.addStrecke(strecke4);
-		Netzverwaltung.addStrecke(strecke5);
-		Netzverwaltung.addStrecke(strecke6);
-		Netzverwaltung.addStrecke(strecke7);
-		Netzverwaltung.addStrecke(strecke8);
-		Netzverwaltung.addStrecke(strecke9);
-		Netzverwaltung.addStrecke(strecke10);
-		Netzverwaltung.addStrecke(strecke11);
-		Netzverwaltung.addStrecke(strecke12);
-		Netzverwaltung.addStrecke(strecke13);
-		Netzverwaltung.addStrecke(strecke14);
-		Netzverwaltung.addStrecke(strecke15);
-		Netzverwaltung.addStrecke(strecke16);
-		Netzverwaltung.addStrecke(strecke17);
-		Netzverwaltung.addStrecke(strecke18);
-		Netzverwaltung.addStrecke(strecke19);
-		Netzverwaltung.addStrecke(strecke20);
-		Netzverwaltung.addStrecke(strecke21);
-		Netzverwaltung.addStrecke(strecke22);
-		Netzverwaltung.addStrecke(strecke23);
-		Netzverwaltung.addStrecke(strecke24);
-		Netzverwaltung.addStrecke(strecke25);
-		Netzverwaltung.addStrecke(strecke26);
-		Netzverwaltung.addStrecke(strecke27);
-		Netzverwaltung.addStrecke(strecke28);
-		Netzverwaltung.addStrecke(strecke29);
-		Netzverwaltung.addStrecke(strecke30);
-		Netzverwaltung.addStrecke(strecke31);
-		Netzverwaltung.addStrecke(strecke32);
+		netzverwaltung.addStrecke(strecke1);
+		netzverwaltung.addStrecke(strecke2);
+		netzverwaltung.addStrecke(strecke3);
+		netzverwaltung.addStrecke(strecke4);
+		netzverwaltung.addStrecke(strecke5);
+		netzverwaltung.addStrecke(strecke6);
+		netzverwaltung.addStrecke(strecke7);
+		netzverwaltung.addStrecke(strecke8);
+		netzverwaltung.addStrecke(strecke9);
+		netzverwaltung.addStrecke(strecke10);
+		netzverwaltung.addStrecke(strecke11);
+		netzverwaltung.addStrecke(strecke12);
+		netzverwaltung.addStrecke(strecke13);
+		netzverwaltung.addStrecke(strecke14);
+		netzverwaltung.addStrecke(strecke15);
+		netzverwaltung.addStrecke(strecke16);
+		netzverwaltung.addStrecke(strecke17);
+		netzverwaltung.addStrecke(strecke18);
+		netzverwaltung.addStrecke(strecke19);
+		netzverwaltung.addStrecke(strecke20);
+		netzverwaltung.addStrecke(strecke21);
+		netzverwaltung.addStrecke(strecke22);
+		netzverwaltung.addStrecke(strecke23);
+		netzverwaltung.addStrecke(strecke24);
+		netzverwaltung.addStrecke(strecke25);
+		netzverwaltung.addStrecke(strecke26);
+		netzverwaltung.addStrecke(strecke27);
+		netzverwaltung.addStrecke(strecke28);
+		netzverwaltung.addStrecke(strecke29);
+		netzverwaltung.addStrecke(strecke30);
+		netzverwaltung.addStrecke(strecke31);
+		netzverwaltung.addStrecke(strecke32);
 		//Züge
-		Netzverwaltung.addZug(zug1);
-		Netzverwaltung.addZug(zug2);
-		Netzverwaltung.addZug(zug3);
-		System.out.println("Context is build");
+		netzverwaltung.addZug(zug1);
+		netzverwaltung.addZug(zug2);
+		netzverwaltung.addZug(zug3);
+		netzverwaltung.getNetzveraltungsOutput().println("Context is build");
 	}
 }

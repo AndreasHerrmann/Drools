@@ -34,8 +34,10 @@ import de.hdm.drools.resource.Zug;
  *
  */
 public class KnowledgeBaseThread extends Thread {
+	NetzverwaltungsOutput netzverwaltungsoutput;
 	private static KieSession kSession=null;
-	public KnowledgeBaseThread(){
+	public KnowledgeBaseThread(NetzverwaltungsOutput netzverwaltungsOutput){
+		this.netzverwaltungsoutput=netzverwaltungsOutput;
 		KieServices kService = KieServices.Factory.get();
     	KieFileSystem kfs = kService.newKieFileSystem();
     	kfs.write(kService.getResources().newClassPathResource("de/hdm/drools/Rules.drl"));
@@ -44,7 +46,7 @@ public class KnowledgeBaseThread extends Thread {
         if( results.hasMessages(Message.Level.ERROR))
         	{
         	System.out.println( results.getMessages() );
-        	NetzverwaltungsOutput.println("KieSession konnte nicht gestartet werden!");
+        	netzverwaltungsoutput.println("KieSession konnte nicht gestartet werden!");
             throw new IllegalStateException( "### errors ###" );
         	}
 
@@ -53,7 +55,7 @@ public class KnowledgeBaseThread extends Thread {
 		KieContainer kieContainer = kService.newKieContainer(kService.getRepository().getDefaultReleaseId());
 		KieBase kBase = kieContainer.newKieBase(config);
 		kSession = kBase.newKieSession();
-		NetzverwaltungsOutput.println("KieSession aufgebaut");
+		netzverwaltungsoutput.println("KieSession aufgebaut");
 	}
 	//Startet die KieSession
 	public void run(){
@@ -65,56 +67,56 @@ public class KnowledgeBaseThread extends Thread {
 			}
 		finally{
 			kSession.halt();
-			NetzverwaltungsOutput.println("KieSession angehalten");
+			netzverwaltungsoutput.println("KieSession angehalten");
 			kSession.dispose();
-			NetzverwaltungsOutput.println("KieSession Resourcen freigegeben");
+			netzverwaltungsoutput.println("KieSession Resourcen freigegeben");
 		}
     }
-	public static void addBahnhof(Bahnhof bahnhof){
+	public void addBahnhof(Bahnhof bahnhof){
 		kSession.insert(bahnhof);
 	}
-	public static void addKnotenpunkt(Knotenpunkt knotenpunkt){
+	public void addKnotenpunkt(Knotenpunkt knotenpunkt){
 		kSession.insert(knotenpunkt);
 	}
-	public static void addStrecke(Strecke strecke){
+	public void addStrecke(Strecke strecke){
 		kSession.insert(strecke);
 	}
-	public static void addZug(Zug zug){
+	public void addZug(Zug zug){
 		kSession.insert(zug);
 	}
-	public static void bahnhofAnmelden(BahnhofAnmeldung bahnhofAnmeldung){
+	public void bahnhofAnmelden(BahnhofAnmeldung bahnhofAnmeldung){
 		kSession.insert(bahnhofAnmeldung);
 	}
-	public static void bahnhofAbmelden(BahnhofAbmeldung bahnhofAbmeldung){
+	public void bahnhofAbmelden(BahnhofAbmeldung bahnhofAbmeldung){
 		kSession.insert(bahnhofAbmeldung);
 	}
-	public static void knotenpunktAnmelden(KnotenpunktAnmeldung knotenpunktAnmeldung){
+	public void knotenpunktAnmelden(KnotenpunktAnmeldung knotenpunktAnmeldung){
 		kSession.insert(knotenpunktAnmeldung);
 	}
-	public static void knotenpunktAbmelden(KnotenpunktAbmeldung knotenpunktAbmeldung){
+	public void knotenpunktAbmelden(KnotenpunktAbmeldung knotenpunktAbmeldung){
 		kSession.insert(knotenpunktAbmeldung);
 	}
-	public static void zugAnmelden(ZugAnmeldung zugAnmeldung){
+	public void zugAnmelden(ZugAnmeldung zugAnmeldung){
 		kSession.insert(zugAnmeldung);
 	}
-	public static void zugAbmelden(ZugAbmeldung zugAbmeldung){
+	public void zugAbmelden(ZugAbmeldung zugAbmeldung){
 		kSession.insert(zugAbmeldung);
 	}
-	public static void fahrtAnfragen(FahrtAnfrageMitAsyncResponse fahrtanfrage){
+	public void fahrtAnfragen(FahrtAnfrageMitAsyncResponse fahrtanfrage){
 		kSession.insert(fahrtanfrage);
 	}
-	public static void fahrtBeginn(FahrtBeginnMitAsyncResponse fahrtbeginn){
+	public void fahrtBeginn(FahrtBeginnMitAsyncResponse fahrtbeginn){
 		kSession.insert(fahrtbeginn);
 	}
-	public static void fahrtAbschluss(FahrtAbschluss fahrtabschluss){
+	public void fahrtAbschluss(FahrtAbschluss fahrtabschluss){
 		kSession.insert(fahrtabschluss);
-		NetzverwaltungsOutput.println("FahrtAbschluss: Strecken-ID:"
+		netzverwaltungsoutput.println("FahrtAbschluss: Strecken-ID:"
 		+fahrtabschluss.getStrecke().getId()+" Zug-ID:"
 				+fahrtabschluss.getZug().getId());
 	}
-	public static void lebenszeichen(Lebenszeichen lebenszeichen){
+	public void lebenszeichen(Lebenszeichen lebenszeichen){
 		kSession.insert(lebenszeichen);
-		NetzverwaltungsOutput.println("Lebenszeichen: Strecken-iD:"
+		netzverwaltungsoutput.println("Lebenszeichen: Strecken-iD:"
 		+lebenszeichen.getStrecke().getId()+" Zug-ID:"
 				+lebenszeichen.getZug().getId());
 	}

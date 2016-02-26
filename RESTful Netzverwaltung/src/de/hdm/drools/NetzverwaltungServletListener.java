@@ -8,13 +8,10 @@ import javax.servlet.ServletContextListener;
  * des Servlets automatisch aufgerufen. contextDestroyed wird beim Beenden des Servlets
  * automatisch aufgerufen. Implementiert ServletContextListener.
  * @author Andreas Herrmann
- * @param logger Der Logger, der gestartet wird, wenn dies in der Config-Klasse angegeben ist
- * @param kieSessionThread Der KnowledgeBaseThread, der gestartet bzw. beendet werden soll
  *
  */
 public class NetzverwaltungServletListener implements ServletContextListener {
-	private static KnowledgeBaseThread kieSessionThread;
-
+	private static Netzverwaltung netzverwaltung;
 	/**
 	 * Wird beim Beenden des Servlets automatisch aufgerufen. Hält den
 	 * KnowledgeBaseThread an und löscht die Referenz auf ihn,
@@ -26,9 +23,7 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent sce)
 		{
-			kieSessionThread.interrupt();
-			kieSessionThread=null;
-			NetzverwaltungsOutput.stop();
+			netzverwaltung.stoppen();
 		}
 
 	/**
@@ -39,9 +34,7 @@ public class NetzverwaltungServletListener implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		NetzverwaltungsOutput.start();
-		kieSessionThread = new KnowledgeBaseThread();
-		kieSessionThread.start();
-		new ContextBuilder();
+		netzverwaltung=new Netzverwaltung();
+		new ContextBuilder(netzverwaltung);
 	}
 }

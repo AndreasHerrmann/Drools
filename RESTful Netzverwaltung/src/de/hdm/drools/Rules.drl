@@ -5,7 +5,7 @@ package de.hdm.drools
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import de.hdm.drools.NetzverwaltungsOutput;
-import de.hdm.drools.Netzverwaltung;
+import de.hdm.drools.RESTController;
 import de.hdm.drools.resource.*;
 import de.hdm.drools.nachricht.*;
 import de.hdm.drools.anmeldung.*;
