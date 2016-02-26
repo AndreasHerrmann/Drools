@@ -27,7 +27,8 @@ import de.hdm.drools.resource.Knotenpunkt;
 import de.hdm.drools.resource.Strecke;
 import de.hdm.drools.resource.Zug;
 
-public class ZugThread extends Thread {
+public class DerZug extends Thread {
+	private Client client=null;
 	private WebTarget netzverwaltung = null;
 	private Zug dieserZug=null;
 	private Fahrplan fahrplan;
@@ -46,85 +47,131 @@ public class ZugThread extends Thread {
 			System.out.println("Anmeldung nicht möglich! Adresse der Netzverwaltung falsch?");
 		}
 		fahrplan=dieserZug.getFahrplan();
-		Client client = ClientBuilder.newClient();
+		client = ClientBuilder.newClient();
 		netzverwaltung = client.target(Config.netzverwaltungAdresse);
+		/**
+		 * Solange der Thread nicht angehalten wird soll der Fahrplan
+		 * abgearbeitet werden.
+		 */
 		while(!isInterrupted()){
+			/**
+			 * Fahrplan Knotenpunkt für Knotenpunkt abarbeiten.
+			 */
 			for(int i=0; i<fahrplan.getAufenthaltszeiten().length;i++){
-				//Wenn der letzte Ort ein Knotenpunkt war
-				if(letzterKnotenpunkt!=null){
-					//Wenn der letzte Knotenpunkt ein Bahnhof war
-					if(letzterKnotenpunkt.getIstBahnhof()){
-						//Wenn der aktuelle Knotenpunkt ein Bahnhof ist
-						if(fahrplan.getFahrtziel(i).getIstBahnhof()){
-							//Wenn der letzte und der aktuelle Bahnhof der gleiche ist
-							if(fahrplan.getFahrtziel(i).getAdresse().equals(letzterKnotenpunkt.getAdresse())){
-								//Den letzten Knotenpunkt auf den aktuellen setzen (Dann bin ich schon durch den Bahnhof gefahren)
-								letzterKnotenpunkt=fahrplan.getFahrtziel(i);
-								letzteStrecke=null;
-							}
-							else{
-								//Wenn er nicht der selbe Bahnhof ist, dann muss ich erst zu ihm hin fahren
-								System.out.println("Bahnhof zu Bahnhof: "+fahrplan.getFahrtziel(i));
-								vonBahnhofZuKnotenpunktFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
-							}
-						}
-						else{
-							/*Wenn der letzte Knotenpunkt ein Bahnhof ist und der aktuelle
-							 * nicht, dann muss ich zu einem Knotenpunkt fahren
-							 */
-							System.out.println("Von Bahnhof zu Knotenpunkt: "+fahrplan.getFahrtziel(i));
-							vonBahnhofZuKnotenpunktFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
-						}
-					}
-					else{
-						/*Wenn der letzte Ort ein Knotenpunkt war und der aktuelle
-						 * kein Bahnhof ist, dann muss ich von diesem Knotenpunkt
-						 * zum nächsten fahren
-						 */
-						System.out.println("Knotenpunkt zu Knotenpunkt :"+fahrplan.getFahrtziel(i));
-						vonKnotenpunktZuKnotenpunktFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
-					}
+				/**
+				 * Wenn der letzte Ort ein Knotenpunkt und ein Bahnhof war
+				 * und der aktuelle notenpunkt auch ein Bahnhof ist und
+				 * beide die selbe Adresse haben, dann bin ich durch den Bahnhof
+				 * hindurch gefahren
+				 */
+				if(letzterKnotenpunkt!=null && letzterKnotenpunkt.getIstBahnhof() &&fahrplan.getFahrtziel(i).getIstBahnhof()
+						&& fahrplan.getFahrtziel(i).getAdresse().equals(letzterKnotenpunkt.getAdresse())){
+					//Den letzten Knotenpunkt auf den aktuellen setzen
+					letzterKnotenpunkt=fahrplan.getFahrtziel(i);
+					letzteStrecke=null;
 				}
+				/**
+				 * Wenn der letzte Ort ein Knotenpunkt und ein Bahnhof war
+				 * und der aktuelle Knotenpunkt auch ein Bahnhof ist und
+				 * beide nicht die selbe Adresse haben, dann muss ich zum
+				 * nächsten Bahnhof fahren
+				 */
+				else if(letzterKnotenpunkt!=null && letzterKnotenpunkt.getIstBahnhof() &&fahrplan.getFahrtziel(i).getIstBahnhof()
+						&& !fahrplan.getFahrtziel(i).getAdresse().equals(letzterKnotenpunkt.getAdresse())){
+					System.out.println("Bahnhof zu Bahnhof: "+fahrplan.getFahrtziel(i));
+					fahreVonBahnhofZuKnotenpunkt(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i));
+				}
+				/**
+				 * Wenn der letze Ort ein Knotenpunkt und ein Bahnhof war und der
+				 * aktuelle ein Knotenpunkt ist, aber kein Bahnhof, dann muss ich
+				 * zu dem Knotenpunkt hinfahren
+				 */
+				else if(letzterKnotenpunkt!=null && letzterKnotenpunkt.getIstBahnhof()
+						&& !fahrplan.getFahrtziel(i).getIstBahnhof()){
+					System.out.println("Von Bahnhof zu Knotenpunkt: "+fahrplan.getFahrtziel(i));
+					fahreVonBahnhofZuKnotenpunkt(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i));
+				}
+				/**
+				 * Wenn der letzte Ort ein Knotenpunkt, aber kein Bahnhof war und
+				 * der aktuelle Knotenpunkt kein Bahnhof ist, dann muss ich von diesem
+				 * Knotenpunkt zum nächsten fahren
+				 */
+				else if(letzterKnotenpunkt!=null && !letzterKnotenpunkt.getIstBahnhof()
+						&& !fahrplan.getFahrtziel(i).getIstBahnhof()){
+					System.out.println("Knotenpunkt zu Knotenpunkt :"+fahrplan.getFahrtziel(i));
+					fahreVomLetztenKnotenpunktZuKnotenpunkt(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i));
+				}
+				/**
+				 * Wenn der letzte Ort kein Knotenpunkt war und der aktuelle ein
+				 * Bahnhof ist, dann muss ich von einer Strecke in einen Bahnhof
+				 * fahren
+				 */
+				else if(letzterKnotenpunkt==null && fahrplan.getFahrtziel(i).getIstBahnhof()){
+					System.out.println("Strecke in Bahnhof :"+fahrplan.getFahrtziel(i));
+					vonStreckeInBahnhofFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
+				}
+				/**
+				 * Wenn der letzte Ort kein Knotenpunkt war und der aktuelle kein
+				 * Bahnhof ist, dann muss ich von einer Strecke auf einen Knotenpunkt
+				 * auffahren
+				 */
+				else if(letzterKnotenpunkt==null && !fahrplan.getFahrtziel(i).getIstBahnhof()){
+					System.out.println("Von Strecke auf Knotenpunkt :"+fahrplan.getFahrtziel(i));
+					vonStreckeAufKnotenpunktFahren(fahrplan.getFahrtziel(i),client);
+				}
+				/**
+				 * Wenn alles nicht zutrifft, dann ist etwas schief gelaufen
+				 */
 				else{
-					//Wenn der letzte Ort kein Knotenpunkt ist, dann ist er eine Strecke
-					if(fahrplan.getFahrtziel(i).getIstBahnhof()){
-						//Wenn der aktuelle Knotenpunkt ein Bahnhof ist, dann muss ich in ihn einfahren
-						System.out.println("Strecke in Bahnhof :"+fahrplan.getFahrtziel(i));
-						vonStreckeInBahnhofFahren(fahrplan.getFahrtziel(i),fahrplan.getAufenthaltszeit(i),client);
-					}
-					else{
-						/*Wenn der aktuelle Knotenpunkt kein Bahnhof ist,
-						 *dann muss ich auf einen Knotenpunkt auffahren
-						 */
-						System.out.println("Von Strecke auf Knotenpunkt :"+fahrplan.getFahrtziel(i));
-						vonStreckeAufKnotenpunktFahren(fahrplan.getFahrtziel(i),client);
-					}
+					System.out.println("ZugThread [Zeile 71-118]: Initiale Verzweigung konnte nicht erfüllt werden!\n");
 				}
 			}
 		}
-		//Nachdem der Thread angehalten wurde den Zug abmelden
+		/**
+		 * Nachdem der Thread angehalten wurde den Zug abmelden
+		 */
 		abmelden();
 	}
-	/*
-	 * Methode um von einem Kotenpunkt zum nächsten zu fahren
+	/**
+	 * Methode um vom {@code letzterKnotenpunkt} zum nächsten zu fahren.
+	 * @param ziel Knotenpunkt zu dem hingefahren werden soll
+	 * @param fahrtzeit Die Fahrtzeit, die die Fahrt dauern soll
 	 */
-	private void vonKnotenpunktZuKnotenpunktFahren(Knotenpunkt knotenpunkt,int fahrtzeit,Client client){
+	private void fahreVomLetztenKnotenpunktZuKnotenpunkt(Knotenpunkt ziel,int fahrtzeit){
+		/**
+		 * Wenn der letzteKnotenpunkt noch keine Adresse hat, dann seine Adresse
+		 * heraus finden
+		 */
 		if(letzterKnotenpunkt.getAdresse()==null){
 			letzterKnotenpunkt.setAdresse(knotenpunktAdresseFinden(letzterKnotenpunkt));
 		}
+		/**
+		 * Ein WebTarget zum letzen Knotenpunkt aufbauen und die Strecken zum
+		 * nächsten Knotenpunkt abfragen
+		 */
 		WebTarget streckenTarget = client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/strecke");
 		Response resp = streckenTarget.request(MediaType.APPLICATION_JSON)
-				.post(Entity.json(knotenpunkt));
+				.post(Entity.json(ziel));
+		/**
+		 * Wenn die Antwort nicht 200:OK ist, dann ist der Knotenpunkt wohl offline
+		 */
 		if(resp.getStatus()!=HttpStatus.OK_200){
-			resp = knotenpunktOffline(knotenpunkt,client);
+			resp = knotenpunktOffline(ziel,client);
 		}
+		/**
+		 * Die erhaltenen Strecken auf der Antwort lesen und wenn ich keine
+		 * zurück bekommen habe, dann ist etwas falsch gelaufen
+		 */
 		Strecke[] strecken = resp.readEntity(Strecke[].class);
 		if(strecken.length<=0){
-			System.out.println("Fehler: Zeile 124");
+			System.out.println("ZugThread [Zeile 165]: Keine Strecken zurück bekommen!");
 			System.out.println(resp);
 		}
+		/**
+		 * Ein WebTarget zur Netzverwaltung aufbauen und FahrtAnfragen für die Strecken
+		 * stellen. Solange machen bis eine Antwort positiv ist.
+		 */
 		WebTarget anfrageTarget = netzverwaltung.path("/fahrt/anfrage");
-		
 		Vector<Response> antworten = new Vector<Response>();
 		do{
 			for(int i=0;i<strecken.length;i++){
@@ -133,10 +180,17 @@ public class ZugThread extends Thread {
 				antworten.addElement(resp);
 			}
 		}while((!eineAntwortWahr(antworten))&&warten(5));
+		/**
+		 * Die positive Antwort finden und wenn es keine gibt, dann einen Fehler ausgeben
+		 */
 		Response trueResponse = wahreAntwortFinden(antworten);
 		if(trueResponse==null){
-			System.out.println("Fehler: Zeile 138");
+			System.out.println("ZugThread [Zeile 176-186]: Keine positive Antwort zurück erhalten!");
 		}
+		/**
+		 * Fahrterlaubnis speichern, WebTarget auf die Netzverwaltung aufbauen und
+		 * dann Fahrtbeginn melden
+		 */
 		FahrtErlaubnis fahrtErlaubnis = trueResponse.readEntity(FahrtErlaubnis.class);
 		WebTarget fahrtBeginnTarget = netzverwaltung.path("/fahrt/beginn");
 		int counter=0;
@@ -145,13 +199,22 @@ public class ZugThread extends Thread {
 			.post(Entity.json(new FahrtBeginn(dieserZug,fahrtErlaubnis.getStrecke())));
 			counter++;
 		}while((resp.getStatus()!=HttpStatus.OK_200)&&(counter<=3)&&(warten(5)));
+		/**
+		 * Wenn es keine positive Rückmeldung gab, dann einen Fehler ausgeben
+		 */
 		if(resp.getStatus()!=HttpStatus.OK_200){
-			System.out.println("Fehler: Zeile 149");
+			System.out.println("ZugThread [Zeile 194-205]: Keine positive Rückmeldung für FahrtBeginn!");
 			System.out.println(resp);
 		}
-		//Abfahrt vom letzten Knotenpunkt melden
+		/**
+		 * Die Abfahrt vom letzten Knotenpunkt melden
+		 */
 		client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/abfahrtMelden")
 		.request(MediaType.APPLICATION_JSON).post(Entity.json(dieserZug));
+		/**
+		 * WebTarget für die Lebenszeichen aufbauen und dann jede Minute ein Lebenszeichen senden
+		 * bis die Fahrt abgeschlossen ist
+		 */
 		WebTarget lebenszeichenTarget = netzverwaltung.path("/fahrt/lebenszeichen");
 		for(int i=0; i<fahrtzeit;i++){
 			//Eine Minute warten
@@ -159,28 +222,41 @@ public class ZugThread extends Thread {
 			//Lebenszeichen absetzen
 			resp = lebenszeichenTarget.request()
 					.post(Entity.json(new Lebenszeichen(dieserZug,fahrtErlaubnis.getStrecke())));
+			/**
+			 * Wenn das Absenden der Lebenszeichen nicht positiv quittiert wurde, dann einen
+			 * Fehler ausgeben
+			 */
 			if(resp.getStatus()!=HttpStatus.OK_200){
-				System.out.println("Fehler: Zeile 162");
+				System.out.println("ZugThread [Zeile 219-229]: Lebenszeichen nicht richtig abgesetzt!");
 				System.out.println(resp);
 			}
 		}
-		//Fahrt abschließen
+		/**
+		 * Die Fahrt abschließen und als letzten Ort die befahrene Strecke speichern
+		 */
 		letzteStrecke = fahrtErlaubnis.getStrecke();
 		letzterKnotenpunkt=null;
 	}
-	/*
+	
+	/**
 	 * Methode um von einem Bahnhof zu einem Knotenpunkt zu fahren
+	 * @param ziel Knotenpunkt zu dem gefahren werden soll
+	 * @param fahrtzeit Die Zeit in Minuten, die die Fahrt dauern soll
 	 */
-	private void vonBahnhofZuKnotenpunktFahren(Knotenpunkt knotenpunkt, int fahrtzeit, Client client){
+	private void fahreVonBahnhofZuKnotenpunkt(Knotenpunkt ziel, int fahrtzeit){
+		/**
+		 * Prüfen, ob für den letzten Knotenpunkt eine Adresse hinterlegt ist.
+		 * Wenn nicht, dann die Adresse des Knotenpunkts herausfinden
+		 */
 		if(letzterKnotenpunkt.getAdresse()==null){
 			letzterKnotenpunkt.setAdresse(knotenpunktAdresseFinden(letzterKnotenpunkt));
 		}
 		WebTarget streckenTarget = client.target("http://"+letzterKnotenpunkt.getAdresse()+":8080").path("/strecke");
 		Response resp = streckenTarget.request(MediaType.APPLICATION_JSON)
-				.post(Entity.json(knotenpunkt));
+				.post(Entity.json(ziel));
 		if(resp.getStatus()!=HttpStatus.OK_200){
 			//Dann ist der Knotenpunkt nicht zu erreichen (Adresse nicht mehr aktuell?)
-			resp = knotenpunktOffline(knotenpunkt,client);
+			resp = knotenpunktOffline(ziel,client);
 		}
 		Strecke strecken[] = resp.readEntity(Strecke[].class);
 		if(strecken.length<=0){

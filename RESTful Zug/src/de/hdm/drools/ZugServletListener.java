@@ -4,7 +4,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 public class ZugServletListener implements ServletContextListener {
-	private static ZugThread zugThread;
+	private static DerZug derZug;
 	
 	/**
 	 * Wird beim Beenden des Servlets automatisch aufgerufen. Hält den
@@ -14,8 +14,8 @@ public class ZugServletListener implements ServletContextListener {
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		zugThread.interrupt();
-		zugThread=null;
+		derZug.interrupt();
+		derZug=null;
 
 	}
 
@@ -26,8 +26,8 @@ public class ZugServletListener implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		zugThread = new ZugThread();
-		zugThread.start();
+		derZug = new DerZug();
+		derZug.start();
 		System.out.println("ZugThread gestartet");
 	}
 }
