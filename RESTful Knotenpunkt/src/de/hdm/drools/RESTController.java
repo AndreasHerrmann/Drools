@@ -1,16 +1,11 @@
 package de.hdm.drools;
 
-import java.util.Vector;
-
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
@@ -18,9 +13,6 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.jetty.http.HttpStatus;
 
-import de.hdm.drools.nachricht.Abfahrt;
-import de.hdm.drools.nachricht.AuffahrtAnfrageMitAsyncResponse;
-import de.hdm.drools.nachricht.AuffahrtMeldungMitAsyncResponse;
 import de.hdm.drools.resource.Knotenpunkt;
 import de.hdm.drools.resource.Strecke;
 import de.hdm.drools.resource.Zug;
@@ -33,44 +25,11 @@ import de.hdm.drools.resource.Zug;
  * @param wegfuehrendeStrecken Alle Strecken, die vom Knotenpunkt wegfuehren
  */
 @Path("/")
-public class KnotenpunktController {
-	/**
-	 * Ein {@link javax.ws.rs.client.WebTarget}, das auf die Netzverwaltung zeigt.
-	 * Wird aus der Adresse in {@link Config} erstellt.
-	 */
-	private static WebTarget netzverwaltung;
-	/**
-	 * Daten des Knotenpunkts, die ihm bei der Anmeldung von der Netzverwaltung übergeben wurden.
-	 */
-	private static Knotenpunkt knotenpunkt;
-	/**
-	 * Alle Strecken, die vom Knotenpunkt wegführen. Wird dem Knotenpunkt von der Netzverwaltung übergeben.
-	 */
-	private static Strecke[] wegfuehrendeStrecken;
+public class RESTController {
+	private static DerKnotenpunkt derKnotenpunkt;
 	
-	/**
-	 * Methode zum Anmelden bei der Netzverwaltung. Fragt die wegführenden Strecken
-	 * bei der Netzverwaltung ab.
-	 */
-	public static void anmelden(){
-		Client client = ClientBuilder.newClient();
-		netzverwaltung = client.target(Config.netzverwaltungAdresse);
-		WebTarget anmeldenTarget = netzverwaltung.path("/knotenpunkt/anmelden");
-		Response resp=anmeldenTarget.request(MediaType.APPLICATION_JSON).post(null);
-		if(resp.getStatus()==HttpStatus.OK_200){
-			knotenpunkt = resp.readEntity(Knotenpunkt.class);
-			WebTarget streckenTarget = netzverwaltung.path("/strecke/von/knotenpunkt");
-			wegfuehrendeStrecken = streckenTarget.request(MediaType.APPLICATION_JSON)
-			.post(Entity.json(knotenpunkt)).readEntity(Strecke[].class);
-		}
-	}
-	
-	/**
-	 * Methode zum Abmelden bei der Netzverwaltung
-	 */
-	public static void abmelden(){
-		WebTarget abmeldenTarget = netzverwaltung.path("/knotenpunkt/abmelden");
-		abmeldenTarget.request().post(Entity.json(knotenpunkt));
+	public static void setDerKnotenpunkt(DerKnotenpunkt derKnotenpunkt){
+		RESTController.derKnotenpunkt=derKnotenpunkt;
 	}
 	
 	/**
@@ -83,15 +42,14 @@ public class KnotenpunktController {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response findStreckeByZiel(@NotNull Knotenpunkt knotenpunkt){
-		Vector<Strecke> gefundeneStrecken = new Vector<Strecke>();
-		for (int i=0;i<wegfuehrendeStrecken.length;i++){
-			if(wegfuehrendeStrecken[i].getZiel().equals(knotenpunkt)){
-				gefundeneStrecken.add(wegfuehrendeStrecken[i]);
-			}
+	public Response findStreckenByZiel(@NotNull Knotenpunkt knotenpunkt){
+		Strecke[] gefundeneStrecken = derKnotenpunkt.findeStreckenAnhandKnotenpunkt(knotenpunkt);
+		if(gefundeneStrecken.length<1){
+			return Response.status(HttpStatus.NOT_FOUND_404).build();
 		}
-		Strecke[] strecken = new Strecke[gefundeneStrecken.size()];
-		return Response.ok(gefundeneStrecken.toArray(strecken)).build();
+		else{
+			return Response.ok(Entity.json(gefundeneStrecken)).build();
+		}
 	}
 	
 	/**
@@ -105,7 +63,7 @@ public class KnotenpunktController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public void auffahrtAnfragen(@Suspended final AsyncResponse asyncResponse,
 			@NotNull Zug zug){
-		KnowledgeBaseThread.auffahrtAnfragen(new AuffahrtAnfrageMitAsyncResponse(asyncResponse,zug));
+		derKnotenpunkt.auffahrtAnfragen(zug, asyncResponse);
 	}
 	
 	/**
@@ -118,7 +76,7 @@ public class KnotenpunktController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void auffahrtMelden(@Suspended final AsyncResponse asyncResponse,
 			@NotNull Zug zug){
-		KnowledgeBaseThread.auffahrtMelden(new AuffahrtMeldungMitAsyncResponse(zug,asyncResponse));
+		derKnotenpunkt.auffahrtMelden(zug, asyncResponse);
 	}
 	
 	/**
@@ -129,7 +87,11 @@ public class KnotenpunktController {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response abfahrtMelden(@NotNull Zug zug){
-		KnowledgeBaseThread.abfahrtMelden(new Abfahrt(zug));
-		return Response.ok().build();
+		if(derKnotenpunkt.abfahrtMelden(zug)){
+			return Response.ok().build();
+		}
+		else{
+			return Response.serverError().build();
+		}
 	}
 }

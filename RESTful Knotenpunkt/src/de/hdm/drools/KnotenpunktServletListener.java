@@ -5,9 +5,9 @@ import javax.servlet.ServletContextListener;
 
 /**
  * Dient zum automatischen Start des {@link KnowledgeBaseThread} und zum Aufruf
- * der Methode {@code anmelden()} des {@link KnotenpunktController} beim Start des Servlets
+ * der Methode {@code anmelden()} des {@link RESTController} beim Start des Servlets
  * und zum automatischen Beenden des {@link KnowledgeBaseThread} und zum Aufruf
- * der Methode {@code abmelden()} des {@link KnotenpunktController} beim Beenden des Servlets.
+ * der Methode {@code abmelden()} des {@link RESTController} beim Beenden des Servlets.
  * Implementiert {@link javax.servlet.ServletContextListener}
  * @author Andreas Herrmann
  * @param kieSessionThread Die Referenz auf den {@link KnowledgeBaseThread} des Servlets
@@ -16,7 +16,7 @@ public class KnotenpunktServletListener implements ServletContextListener {
 	/**
 	 * Die Referenz auf den {@link KnowledgeBaseThread} des Servlets.
 	 */
-	private static KnowledgeBaseThread kieSessionThread;
+	private DerKnotenpunkt derKnotenpunkt;
 	
 	/**
 	 * Wird beim Beenden des Servlets automatisch aufgerufen. Hält den
@@ -26,23 +26,18 @@ public class KnotenpunktServletListener implements ServletContextListener {
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		KnotenpunktController.abmelden();
-		kieSessionThread.interrupt();
-		kieSessionThread=null;
+		derKnotenpunkt.anhalten();
 	}
 	
 	/**
 	 * Wird beim Start des Servlets automatisch aufgerufen.
 	 * Erstellt einen neuen KnowledgeBaseThread und startet diesen.
-	 * Ruft die Methode {@code anmelden()} des {@link KnotenpunktController} auf.
+	 * Ruft die Methode {@code anmelden()} des {@link RESTController} auf.
 	 * @param sce Das ServletContextEvent, dass zum Aufrufen der Methode geführt hat
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		kieSessionThread = new KnowledgeBaseThread();
-		kieSessionThread.start();
-		System.out.println("KieSession gestartet");
-		KnotenpunktController.anmelden();
+		derKnotenpunkt = new DerKnotenpunkt();
 	}
 
 }
