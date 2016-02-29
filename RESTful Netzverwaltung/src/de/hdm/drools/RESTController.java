@@ -41,6 +41,9 @@ import de.hdm.drools.resource.Zug;
 public class RESTController {
 	private static Netzverwaltung netzverwaltung=null;
 	
+	public static void setNetzverwaltung(Netzverwaltung netzverwaltung){
+		RESTController.netzverwaltung=netzverwaltung;
+	}
 	
 	@Path("/knotenpunkt/anmelden")
 	@POST

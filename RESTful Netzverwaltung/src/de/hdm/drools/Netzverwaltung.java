@@ -40,6 +40,7 @@ public class Netzverwaltung {
 		if(kieSessionThread==null){
 			kieSessionThread=new KnowledgeBaseThread(netzverwaltungsOutput);
 		}
+		RESTController.setNetzverwaltung(this);
 	}
 	public void stoppen(){
 		kieSessionThread.interrupt();
