@@ -54,6 +54,7 @@ public class DerBahnhof {
 		kieSessionThread = new KnowledgeBaseThread();
 		kieSessionThread.start();
 		anmelden();
+		RESTController.setDerBahnhof(this);
 	}
 	public void anhalten(){
 		abmelden();
