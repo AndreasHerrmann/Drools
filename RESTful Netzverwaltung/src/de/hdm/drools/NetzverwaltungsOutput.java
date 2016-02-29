@@ -3,23 +3,22 @@ package de.hdm.drools;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.NoSuchElementException;
 
 public class NetzverwaltungsOutput {
 	private static ArrayDeque<String> outputString;
 	private static SimpleDateFormat sdf;
 	
 	public void println(String line){
-		outputString.addLast("\n["+sdf.format(new Date())+"] "+line+"\r\n");
+		outputString.addLast("\n["+sdf.format(new Date())+"] "+line);
 		System.out.println(line);
 	}
 	public String getNextString(){
-		String string=new String();
-		try{
-			string = outputString.removeFirst();			
+		String string=new String("");
+		while(!outputString.isEmpty()){
+			string = string+outputString.removeFirst();		
 		}
-		catch(NoSuchElementException nsee){
-			return "";
+		if(string!=null){
+			string=string+"\r\n";
 		}
 		return string;
 
