@@ -5,18 +5,15 @@ import javax.servlet.ServletContextListener;
 
 /**
  * Dient zum automatischen Start des {@link KnowledgeBaseThread} und zum Aufruf
- * der Methode {@code anmelden()} des {@link BahnhofController} beim Start des Servlets
+ * der Methode {@code anmelden()} des {@link RESTController} beim Start des Servlets
  * und zum automatischen Beenden des {@link KnowledgeBaseThread} und zum Aufruf
- * der Methode {@code abmelden()} des {@link BahnhofController} beim Beenden des Servlets.
+ * der Methode {@code abmelden()} des {@link RESTController} beim Beenden des Servlets.
  * Implementiert {@link javax.servlet.ServletContextListener}
  * @author Andreas Herrmann
  * @param kieSessionThread Die Referenz auf den {@link KnowledgeBaseThread} des Servlets
  */
 public class BahnhofServletListener implements ServletContextListener{
-	/**
-	 * Die Referenz auf den {@link KnowledgeBaseThread} des Servlets.
-	 */
-	private static KnowledgeBaseThread kieSessionThread;
+	private DerBahnhof bahnhof;
 	
 	/**
 	 * Wird beim Beenden des Servlets automatisch aufgerufen. Hält den
@@ -26,10 +23,8 @@ public class BahnhofServletListener implements ServletContextListener{
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		BahnhofController.abmelden();
-		kieSessionThread.interrupt();
-		kieSessionThread=null;
-
+		bahnhof.anhalten();
+		bahnhof = null;
 	}
 
 	/**
@@ -39,8 +34,6 @@ public class BahnhofServletListener implements ServletContextListener{
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		kieSessionThread = new KnowledgeBaseThread();
-		kieSessionThread.start();
-		System.out.println("KieSession gestartet");
+		bahnhof=new DerBahnhof();
 	}
 }

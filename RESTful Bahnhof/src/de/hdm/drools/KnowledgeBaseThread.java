@@ -27,7 +27,7 @@ public class KnowledgeBaseThread extends Thread {
 	 * Die {@link org.kie.api.runtime.KieSession}, die in dem Thread läuft und
 	 * alle Entscheidungen des Bahnhofs trifft. 
 	 */
-	private static KieSession kSession=null;
+	private KieSession kSession=null;
 	/**
 	 * Wird beim Start des Threads aufgerufen. Erstellt die {@link org.kie.api.runtime.KieSession}
 	 * und lässt diese feuern bis der Thread angehalten wird.
@@ -53,7 +53,6 @@ public class KnowledgeBaseThread extends Thread {
 			KieBase kBase = kieContainer.newKieBase(config);
 			kSession = kBase.newKieSession();
 			System.out.println("KieSession aufgebaut");
-			BahnhofController.anmelden();
 			kSession.fireUntilHalt();
 		}
 		catch(Throwable t){
@@ -71,7 +70,7 @@ public class KnowledgeBaseThread extends Thread {
 	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
 	 * @param fahrtanfrageMitAsync Die {@link de.hdm.drools.nachricht.EinfahrtAnfrageMitAsyncResponse}, die eingefügt werden soll
 	 */
-	public static void fahrtAnfragen(EinfahrtAnfrageMitAsyncResponse fahrtanfrageMitAsync){
+	public void einfahrtAnfragen(EinfahrtAnfrageMitAsyncResponse fahrtanfrageMitAsync){
 		kSession.insert(fahrtanfrageMitAsync);
 	}
 	/**
@@ -79,7 +78,7 @@ public class KnowledgeBaseThread extends Thread {
 	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
 	 * @param einfahrtMitAsync Die {@link de.hdm.drools.nachricht.EinfahrtMitAsyncResponse}, die eingefügt werden soll
 	 */
-	public static void einfahrtMelden(EinfahrtMitAsyncResponse einfahrtMitAsync){
+	public void einfahrtMelden(EinfahrtMitAsyncResponse einfahrtMitAsync){
 		kSession.insert(einfahrtMitAsync);
 	}
 	/**
@@ -87,7 +86,7 @@ public class KnowledgeBaseThread extends Thread {
 	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
 	 * @param abfahrt Die {@link de.hdm.drools.nachricht.Abfahrt}, die eingefügt werden soll
 	 */
-	public static void abfahrtMelden(Abfahrt abfahrt){
+	public void abfahrtMelden(Abfahrt abfahrt){
 		kSession.insert(abfahrt);
 	}
 	/**
@@ -95,7 +94,7 @@ public class KnowledgeBaseThread extends Thread {
 	 * in die {@link org.kie.api.runtime.KieSession} des Threads.
 	 * @param gleis Das {@link e.hdm.drools.resource.Gleis}, das eingefügt werden soll
 	 */
-	public static void gleisEinfuegen(Gleis gleis){
+	public void gleisEinfuegen(Gleis gleis){
 			kSession.insert(gleis);
 	}
 }		
